@@ -1,0 +1,37 @@
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: pocketbase
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pocketbase/data:/pb_data
+      - ./pocketbase/public:/pb_public # optional
+      - ./pocketbase/hooks:/pb_hooks # optional
+    healthcheck: # optional, recommended since v0.10.0
+      test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    restart: unless-stopped
+    ports:
+      - "9997:9997" # API
+      - "8554:8554" # RTSP
+      - "8888:8888" # API and metrics
+      - "8889:8889" # HLS
+      - "1935:1935" # RTMP
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
