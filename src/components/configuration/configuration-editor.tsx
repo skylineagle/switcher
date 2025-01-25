@@ -34,7 +34,10 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
     config: string;
     automation: CameraAutomation | null;
   } | null>(null);
-  const [isValid, setIsValid] = useState(true);
+  const [isJsonValid, setIsJsonValid] = useState(true);
+  const [currentTab, setCurrentTab] = useState<"automation" | "config">(
+    "automation"
+  );
   const monacoRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const { mutate: updateCameraMutation } = useMutation({
@@ -69,8 +72,47 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
   };
 
   function handleEditorValidation(markers: EditorMarker[]) {
-    setIsValid(markers.length === 0);
+    console.log(markers);
+    setIsJsonValid(markers.length === 0);
   }
+
+  const isAutomationValid = () => {
+    if (!editingConfig?.automation) return false;
+    const { minutesOn, minutesOff } = editingConfig.automation;
+    return minutesOn > 0 && minutesOff > 0;
+  };
+
+  const isSaveDisabled = () => {
+    if (currentTab === "config") return !isJsonValid;
+    return !isAutomationValid();
+  };
+
+  const handleSave = () => {
+    if (!editingConfig) return;
+
+    if (currentTab === "config") {
+      try {
+        const parsedConfig = JSON.parse(editingConfig.config);
+        updateCameraMutation({
+          id: editingConfig.id,
+          configuration: parsedConfig,
+          automation: editingConfig.automation,
+        });
+      } catch {
+        toast.error("Invalid JSON configuration");
+      }
+    } else {
+      if (!isAutomationValid()) {
+        toast.error("Minutes On and Minutes Off must be greater than 0");
+        return;
+      }
+      updateCameraMutation({
+        id: editingConfig.id,
+        configuration: JSON.parse(editingConfig.config),
+        automation: editingConfig.automation,
+      });
+    }
+  };
 
   return (
     <Dialog
@@ -97,7 +139,12 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
             Configure camera settings and automation.
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="automation">
+        <Tabs
+          defaultValue="automation"
+          onValueChange={(value) =>
+            setCurrentTab(value as "automation" | "config")
+          }
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="automation">Automation</TabsTrigger>
             <TabsTrigger value="config">Configuration</TabsTrigger>
@@ -182,22 +229,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
           <Button variant="outline" onClick={() => setEditingConfig(null)}>
             Cancel
           </Button>
-          <Button
-            onClick={() => {
-              if (!editingConfig || !isValid) return;
-              try {
-                const parsedConfig = JSON.parse(editingConfig.config);
-                updateCameraMutation({
-                  id: editingConfig.id,
-                  configuration: parsedConfig,
-                  automation: editingConfig.automation,
-                });
-              } catch {
-                toast.error("Invalid JSON configuration");
-              }
-            }}
-            disabled={!isValid}
-          >
+          <Button onClick={handleSave} disabled={isSaveDisabled()}>
             Save
           </Button>
         </DialogFooter>
