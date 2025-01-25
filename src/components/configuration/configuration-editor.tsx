@@ -76,7 +76,6 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
   };
 
   function handleEditorValidation(markers: EditorMarker[]) {
-    console.log(markers);
     setIsJsonValid(markers.length === 0);
   }
 
@@ -130,7 +129,6 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [editingConfig, currentTab, isSaveDisabled, handleSave]);
 
-  console.log(user?.level);
   return (
     <Dialog
       open={editingConfig?.id === camera.id}

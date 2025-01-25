@@ -29,23 +29,28 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
       ) {
         throw new Error("Failed to fetch next execution");
       }
+      console.log(data?.nextExecution);
 
       const secondsUntilNextExecution = Math.floor(
         (new Date(data?.nextExecution).getTime() - new Date().getTime()) / 1000
       );
 
       if (secondsUntilNextExecution < camera.automation.minutesOff * 60) {
-        return { countdownTime: secondsUntilNextExecution, until: "on" };
+        return {
+          countdownTime: new Date(data?.nextExecution).getTime(),
+          until: "on",
+        };
       } else {
         return {
           countdownTime:
-            secondsUntilNextExecution - camera.automation.minutesOff * 60,
+            new Date(data?.nextExecution).getTime() -
+            camera.automation.minutesOff * 60 * 1000,
           until: "off",
         };
       }
     },
-    enabled: camera.mode === "auto",
-    refetchInterval: 1000,
+    // enabled: camera.mode === "auto",
+    refetchInterval: 10000,
   });
 
   if (camera.mode !== "auto" || !camera.automation) {
@@ -53,13 +58,13 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
   }
 
   return (
-    <div className="text-sm text-muted-foreground">
-      <div className="flex items-center space-x-2">
-        <Countdown
-          date={new Date().getTime() + (data?.countdownTime || 0) * 60 * 1000}
-        />
-        <Label>until {data?.until}</Label>
+    data?.countdownTime && (
+      <div className="text-sm text-muted-foreground">
+        <div className="flex items-center space-x-2">
+          <Countdown date={data?.countdownTime} />
+          <Label>until {data?.until}</Label>
+        </div>
       </div>
-    </div>
+    )
   );
 }
