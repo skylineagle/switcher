@@ -53,6 +53,8 @@ services:
       context: .
       dockerfile: Dockerfile.baker
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       - MEDIAMTX_API=http://mediamtx:9997
       - POCKETBASE_URL=http://pocketbase:8090
