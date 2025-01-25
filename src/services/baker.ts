@@ -1,16 +1,14 @@
+import { CameraConfiguration } from "@/types/types";
 import { Elysia } from "elysia";
 import {
   createJob,
+  deleteJob,
+  getJobStatus,
+  getNextExecution,
   startJob,
   stopJob,
-  getJobStatus,
-  deleteJob,
-  getNextExecution,
 } from "./auto-mode-jobs";
-import { CameraConfiguration } from "@/types/types";
 import { logger } from "./logger";
-
-// {"minutesOn":1,"minutesOff":1}
 
 const app = new Elysia()
   .onError(({ code, error, request }) => {
@@ -30,10 +28,10 @@ app.post("/jobs/:camera", async ({ params, body }) => {
   try {
     const { camera } = params;
     const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
-    logger.info(parsedBody);
-    const config = body as CameraConfiguration;
+    const config = parsedBody as CameraConfiguration;
 
     logger.info("Creating new job");
+    logger.info(config);
     await createJob(camera, config);
 
     return { success: true };

@@ -2,7 +2,11 @@ import { pb } from "@/lib/pocketbase";
 import { CameraConfiguration } from "@/types/types";
 import { Baker, Status } from "cronbake";
 import { logger } from "./logger";
-import { addMediaMTXPath, removeMediaMTXPath } from "./mediamtx-controller";
+import {
+  addMediaMTXPath,
+  getMediaMTXPaths,
+  removeMediaMTXPath,
+} from "./mediamtx-controller";
 
 const baker = Baker.create();
 
@@ -34,13 +38,15 @@ initializeJobs();
 
 export async function createJob(
   camera: string,
-  params: CameraConfiguration
+  configuration: CameraConfiguration
 ): Promise<void> {
   try {
     logger.info(`Creating job for camera ${camera}`);
     baker.add({
       name: camera,
-      cron: `@every_${params.minutesOn + params.minutesOff}_minutes`,
+      cron: `@every_${
+        configuration.minutesOn + configuration.minutesOff
+      }_minutes`,
       start: false,
       callback: async () => {
         // Turn camera on
@@ -53,7 +59,7 @@ export async function createJob(
           // Turn camera off after duration
           await removeMediaMTXPath(data.name);
           logger.info(`Camera ${camera} turned off`);
-        }, params.minutesOn * 1000);
+        }, configuration.minutesOn * 60 * 1000);
       },
     });
   } catch (error) {
@@ -110,3 +116,26 @@ export async function getNextExecution(camera: string): Promise<Date> {
     throw error;
   }
 }
+
+async function updateStatus() {
+  const cameras = await pb.collection("cameras").getFullList();
+  const pathList = await getMediaMTXPaths();
+  const paths = pathList.items.map((path: { name: string }) => path.name);
+
+  for (const camera of cameras) {
+    const status = paths.includes(camera.name);
+    await pb.collection("cameras").update(camera.id, { status });
+  }
+}
+
+baker.add({
+  name: "live-status",
+  cron: "@every_5_seconds",
+  start: true,
+  callback: async () => {
+    await updateStatus();
+  },
+  onTick: () => {
+    logger.info("Updating camera statuses");
+  },
+});

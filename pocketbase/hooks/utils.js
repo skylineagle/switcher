@@ -29,7 +29,7 @@ function updateStatus() {
     // Update status for each live camera
     for (const camera of cameras) {
       const cameraName = camera.get("name");
-      const cameraStatus = liveCameras.includes(cameraName) ? "on" : "off";
+      const cameraStatus = liveCameras.includes(cameraName);
       $app
         .logger()
         .info(`Updating Camera ${cameraName} status to: ${cameraStatus}`);

@@ -17,11 +17,7 @@ import {
 } from "@/components/ui/table";
 import { pb } from "@/lib/pocketbase";
 import { getCameras, updateCamera } from "@/services/cameras";
-import {
-  CamerasModeOptions,
-  CamerasResponse,
-  CamerasStatusOptions,
-} from "@/types/db.types";
+import { CamerasModeOptions, CamerasResponse } from "@/types/db.types";
 import { UpdateCamera } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -124,7 +120,11 @@ export function CamerasPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {Object.values(CamerasModeOptions).map((mode) => (
-                          <SelectItem key={mode} value={mode}>
+                          <SelectItem
+                            key={mode}
+                            value={mode}
+                            disabled={mode === "auto" && !camera.configuration}
+                          >
                             {mode}
                           </SelectItem>
                         ))}
@@ -132,14 +132,8 @@ export function CamerasPage() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        camera.status === CamerasStatusOptions.on
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {camera.status}
+                    <Badge variant={camera.status ? "default" : "secondary"}>
+                      {camera.status ? "On" : "Off"}
                     </Badge>
                   </TableCell>
                   <TableCell>
