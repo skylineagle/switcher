@@ -108,3 +108,6 @@ app.get("/jobs/:camera/next", async ({ params }) => {
 
 app.listen(3000);
 logger.info("🦊 Baker API server running at http://localhost:3000");
+logger.info(`Pocketbase URL: ${import.meta.env.VITE_POCKETBASE_URL}`);
+logger.info(`Stream URL: ${import.meta.env.VITE_STREAM_URL}`);
+logger.info(`Baker URL: ${import.meta.env.VITE_BAKER_URL}`);
