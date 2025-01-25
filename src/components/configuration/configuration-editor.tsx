@@ -8,20 +8,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { updateCamera } from "@/services/cameras";
-import { CamerasResponse, UpdateCamera } from "@/types/types";
+import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import type * as Monaco from "monaco-editor";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { cameraConfigSchema } from "./consts";
 import { EditorMarker } from "./types";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CameraAutomation } from "@/types/types";
 
 export interface ConfigurationEditorProps {
   camera: CamerasResponse;
@@ -76,18 +75,18 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
     setIsJsonValid(markers.length === 0);
   }
 
-  const isAutomationValid = () => {
+  const isAutomationValid = useCallback(() => {
     if (!editingConfig?.automation) return false;
     const { minutesOn, minutesOff } = editingConfig.automation;
     return minutesOn > 0 && minutesOff > 0;
-  };
+  }, [editingConfig]);
 
-  const isSaveDisabled = () => {
+  const isSaveDisabled = useCallback(() => {
     if (currentTab === "config") return !isJsonValid;
     return !isAutomationValid();
-  };
+  }, [currentTab, isJsonValid, isAutomationValid]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!editingConfig) return;
 
     if (currentTab === "config") {
@@ -112,7 +111,19 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
         automation: editingConfig.automation,
       });
     }
-  };
+  }, [editingConfig, currentTab, updateCameraMutation, isAutomationValid]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (!isSaveDisabled()) handleSave();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [editingConfig, currentTab, isSaveDisabled, handleSave]);
 
   return (
     <Dialog

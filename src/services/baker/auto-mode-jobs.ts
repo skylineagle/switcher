@@ -1,4 +1,4 @@
-import { pb } from "@/lib/pocketbase";
+import { pb } from "@/services/baker/pocketbase";
 import { CameraAutomation, CamerasResponse } from "@/types/types";
 import { Baker, Status } from "cronbake";
 import { logger } from "./logger";

@@ -26,6 +26,7 @@ import { ConfigurationEditor } from "../configuration/configuration-editor";
 import { DeleteCamera } from "../delete-camera/delete-camera";
 import { StatusIndicator } from "../status-indicator";
 import { StreamLink } from "../stream-link";
+import { AutomationIndicator } from "@/components/automation-indicator";
 
 export function CamerasPage() {
   const queryClient = useQueryClient();
@@ -99,6 +100,7 @@ export function CamerasPage() {
               <TableHead className="w-[30%]">Name</TableHead>
               <TableHead className="w-[25%]">Mode</TableHead>
               <TableHead className="w-[20%]">Status</TableHead>
+              <TableHead className="w-[20%]">Automation</TableHead>
               <TableHead className="w-[25%]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -140,6 +142,9 @@ export function CamerasPage() {
                   </TableCell>
                   <TableCell>
                     <StatusIndicator status={camera.status} />
+                  </TableCell>
+                  <TableCell>
+                    <AutomationIndicator camera={camera} />
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

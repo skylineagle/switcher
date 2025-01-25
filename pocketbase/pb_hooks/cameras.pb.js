@@ -43,6 +43,36 @@ onRecordUpdateRequest((e) => {
   const mode = e.record.get("mode");
   const automation = e.record.get("automation");
 
+  // Sync name with configuration.name
+  if (name && name !== current.get("name")) {
+    $app.logger().info("Name changed, syncing with configuration");
+    try {
+      const configuration = JSON.parse(e.record.get("configuration"));
+      configuration.name = name;
+      e.record.set("configuration", JSON.stringify(configuration));
+    } catch (error) {
+      $app.logger().error("Failed to sync name with configuration", error);
+      throw new Error("Failed to sync name with configuration");
+    }
+  }
+
+  // Sync configuration.name with name
+  try {
+    const configuration = JSON.parse(e.record.get("configuration"));
+    const currentConfiguration = JSON.parse(current.get("configuration"));
+    if (configuration.name !== currentConfiguration.name) {
+      $app
+        .logger()
+        .info("Configuration name changed, syncing with camera name");
+      e.record.set("name", configuration.name);
+    }
+  } catch (error) {
+    $app
+      .logger()
+      .error("Failed to sync configuration name with camera name", error);
+    throw new Error("Failed to sync configuration name with camera name");
+  }
+
   // On Automation Settings Change
   if (
     automation &&

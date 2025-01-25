@@ -101,7 +101,7 @@ app.get("/jobs/:camera/next", async ({ params }) => {
   const status = getJobStatus(camera);
   return {
     success: true,
-    nextExecution: nextExecution.toLocaleTimeString(),
+    nextExecution: nextExecution.toISOString(),
     status,
   };
 });

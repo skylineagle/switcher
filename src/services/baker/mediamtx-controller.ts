@@ -1,6 +1,6 @@
 import { CameraConfiguration } from "@/types/types";
 import { logger } from "./logger";
-import { MEDIAMTX_API } from "@/config";
+import { MEDIAMTX_API } from "@/services/baker/config";
 
 export const API_URL = `${MEDIAMTX_API}/v3`;
 
