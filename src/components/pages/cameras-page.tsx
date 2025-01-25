@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { pb } from "@/lib/pocketbase";
+import { useAuthStore } from "@/services/auth";
 import { getCameras, updateCamera } from "@/services/cameras";
 import { CamerasModeOptions, CamerasResponse } from "@/types/db.types";
 import { UpdateCamera } from "@/types/types";
@@ -28,6 +29,7 @@ import { toast } from "sonner";
 import { CameraName } from "../camera-name";
 
 export function CamerasPage() {
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
   const { data: cameras, isLoading: isCamerasLoading } = useQuery({
@@ -145,7 +147,10 @@ export function CamerasPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <ConfigurationEditor camera={camera} />
-                      <DeleteCamera camera={camera} />
+                      {user?.level === "manager" ||
+                        (user?.level === "super" && (
+                          <DeleteCamera camera={camera} />
+                        ))}
                     </div>
                   </TableCell>
                 </TableRow>

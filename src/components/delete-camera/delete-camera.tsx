@@ -9,11 +9,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
 import { deleteCamera } from "@/services/cameras";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { CamerasResponse } from "@/types/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function DeleteCamera({ camera }: { camera: CamerasResponse }) {
   const queryClient = useQueryClient();

@@ -1,3 +1,6 @@
+import { cameraConfigSchema } from "@/components/configuration/consts";
+import { EditorMarker } from "@/components/configuration/types";
+import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/services/auth";
 import { updateCamera } from "@/services/cameras";
 import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
@@ -19,15 +24,13 @@ import { Pencil } from "lucide-react";
 import type * as Monaco from "monaco-editor";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { cameraConfigSchema } from "./consts";
-import { EditorMarker } from "./types";
-import { useTheme } from "../theme-provider";
 
 export interface ConfigurationEditorProps {
   camera: CamerasResponse;
 }
 
 export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const { theme } = useTheme();
   const [editingConfig, setEditingConfig] = useState<{
@@ -127,6 +130,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [editingConfig, currentTab, isSaveDisabled, handleSave]);
 
+  console.log(user?.level);
   return (
     <Dialog
       open={editingConfig?.id === camera.id}
@@ -158,9 +162,20 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
             setCurrentTab(value as "automation" | "config")
           }
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="automation">Automation</TabsTrigger>
-            <TabsTrigger value="config">Configuration</TabsTrigger>
+          <TabsList
+            className={cn(
+              "w-full",
+              user?.level !== "user" && "grid grid-cols-2"
+            )}
+          >
+            <TabsTrigger className="w-full" value="automation">
+              <Label className="text-foreground">Automation</Label>
+            </TabsTrigger>
+            {user?.level !== "user" && (
+              <TabsTrigger className="w-full" value="config">
+                <Label className="text-foreground">Configuration</Label>
+              </TabsTrigger>
+            )}
           </TabsList>
           <TabsContent value="config" className="py-4">
             <Editor

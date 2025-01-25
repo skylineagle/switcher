@@ -108,12 +108,18 @@ export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
 	updated?: IsoDateString
 }
 
+export enum UsersLevelOptions {
+	"super" = "super",
+	"manager" = "manager",
+	"user" = "user",
+}
 export type UsersRecord = {
 	avatar?: string
 	created?: IsoDateString
 	email: string
 	emailVisibility?: boolean
 	id: string
+	level?: UsersLevelOptions
 	name?: string
 	password: string
 	tokenKey: string
