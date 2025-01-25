@@ -2,7 +2,7 @@ name: Docker Build and Publish
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "staging", "dev"]
     tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
@@ -16,6 +16,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+
+    # Set environment based on branch/event
+    environment: ${{ startsWith(github.ref, 'refs/tags/') && 'production' || github.ref == 'refs/heads/main' && 'staging' || 'staging' }}
 
     steps:
       - name: Checkout repository
@@ -41,12 +44,19 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_STREAM_URL=${{ secrets.VITE_STREAM_URL }}
+            VITE_BAKER_URL=${{ secrets.VITE_BAKER_URL }}
+            VITE_POCKETBASE_URL=${{ secrets.VITE_POCKETBASE_URL }}
 
   baker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
+    # Set environment based on branch/event
+    environment: ${{ startsWith(github.ref, 'refs/tags/') && 'production' || github.ref == 'refs/heads/main' && 'staging' || 'staging' }}
 
     steps:
       - name: Checkout repository
