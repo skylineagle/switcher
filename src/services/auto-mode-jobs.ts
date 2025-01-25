@@ -16,6 +16,7 @@ async function initializeJobs() {
       .collection("cameras")
       .getFullList<CamerasResponse>();
 
+    logger.info(`Found ${cameras.length} cameras`);
     for (const camera of cameras) {
       if (camera.automation) {
         await createJob(camera.id, camera.automation);
@@ -24,6 +25,11 @@ async function initializeJobs() {
         if (camera.mode === "auto") {
           logger.info(`Starting job for camera ${camera.id} on auto mode`);
           await startJob(camera.id);
+        } else if (camera.mode === "live") {
+          if (camera.configuration) {
+            logger.info(`Starting job for camera ${camera.id} on live mode`);
+            await addMediaMTXPath(camera.name, camera.configuration);
+          }
         }
       }
     }
