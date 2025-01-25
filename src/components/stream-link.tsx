@@ -1,7 +1,11 @@
-import { CamerasResponse } from "@/types/types";
+import { Camera } from "@/types/types";
 import { Video } from "lucide-react";
 
-export function StreamLink({ camera }: { camera: CamerasResponse }) {
+export interface StreamLinkProps {
+  camera: Camera;
+}
+
+export function StreamLink({ camera }: StreamLinkProps) {
   return (
     <a
       href={`${import.meta.env.VITE_STREAM_URL}/${camera.name}`}

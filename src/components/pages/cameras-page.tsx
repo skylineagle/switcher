@@ -2,7 +2,6 @@ import { AutomationIndicator } from "@/components/automation-indicator";
 import { ConfigurationEditor } from "@/components/configuration/configuration-editor";
 import { DeleteCamera } from "@/components/delete-camera/delete-camera";
 import { StatusIndicator } from "@/components/status-indicator";
-import { StreamLink } from "@/components/stream-link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -23,10 +22,10 @@ import { pb } from "@/lib/pocketbase";
 import { getCameras, updateCamera } from "@/services/cameras";
 import { CamerasModeOptions, CamerasResponse } from "@/types/db.types";
 import { UpdateCamera } from "@/types/types";
-import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { CameraName } from "../camera-name";
 
 export function CamerasPage() {
   const queryClient = useQueryClient();
@@ -109,10 +108,7 @@ export function CamerasPage() {
               return (
                 <TableRow key={camera.id}>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Label>{camera.name || "Unnamed Camera"}</Label>
-                      <StreamLink camera={camera} />
-                    </div>
+                    <CameraName camera={camera} />
                   </TableCell>
                   <TableCell>
                     <Select
