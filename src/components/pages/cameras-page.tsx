@@ -1,3 +1,8 @@
+import { AutomationIndicator } from "@/components/automation-indicator";
+import { ConfigurationEditor } from "@/components/configuration/configuration-editor";
+import { DeleteCamera } from "@/components/delete-camera/delete-camera";
+import { StatusIndicator } from "@/components/status-indicator";
+import { StreamLink } from "@/components/stream-link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -22,11 +27,6 @@ import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { ConfigurationEditor } from "../configuration/configuration-editor";
-import { DeleteCamera } from "../delete-camera/delete-camera";
-import { StatusIndicator } from "../status-indicator";
-import { StreamLink } from "../stream-link";
-import { AutomationIndicator } from "@/components/automation-indicator";
 
 export function CamerasPage() {
   const queryClient = useQueryClient();
@@ -124,10 +124,10 @@ export function CamerasPage() {
                         });
                       }}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="w-32">
                         {Object.values(CamerasModeOptions).map((mode) => (
                           <SelectItem
                             key={mode}

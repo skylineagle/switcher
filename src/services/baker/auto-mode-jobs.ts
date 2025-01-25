@@ -52,7 +52,7 @@ export async function createJob(
     logger.info(`Creating job for camera ${camera}`);
     baker.add({
       name: camera,
-      cron: `@every_${automation.minutesOn + automation.minutesOff}_seconds`,
+      cron: `@every_${automation.minutesOn + automation.minutesOff}_minutes`,
       start: false,
       callback: async () => {
         // Turn camera on
@@ -78,7 +78,7 @@ export async function createJob(
           } else {
             logger.info(`Job for camera ${camera} is not running, skipping`);
           }
-        }, automation.minutesOn * 1000);
+        }, automation.minutesOn * 60 * 1000);
       },
     });
   } catch (error) {
