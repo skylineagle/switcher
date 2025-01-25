@@ -56,7 +56,7 @@ export async function createJob(
       start: false,
       callback: async () => {
         // Turn camera on
-        logger.info(`Starting automation routinefor camera ${camera}`);
+        logger.info(`Starting automation routine for camera ${camera}`);
         const data = await pb
           .collection("cameras")
           .getOne<CamerasResponse>(camera);
@@ -67,12 +67,17 @@ export async function createJob(
         await addMediaMTXPath(data.name, data.configuration);
         updateStatus();
         logger.info(`Camera ${camera} turned on`);
+
         // Keep camera on for specified duration
         setTimeout(async () => {
-          // Turn camera off after duration
-          await removeMediaMTXPath(data.name);
-          updateStatus();
-          logger.info(`Camera ${camera} turned off`);
+          if (baker.isRunning(camera)) {
+            // Turn camera off after duration
+            await removeMediaMTXPath(data.name);
+            updateStatus();
+            logger.info(`Camera ${camera} turned off`);
+          } else {
+            logger.info(`Job for camera ${camera} is not running, skipping`);
+          }
         }, automation.minutesOn * 1000);
       },
     });

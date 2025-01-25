@@ -95,12 +95,8 @@ onRecordUpdateRequest((e) => {
         deleteMediaMTXPath(name);
         startCameraJob(e.record.id);
       } else if (mode === "live") {
-        const status = getJobStatus(e.record.id);
-
-        if (status === "running") {
-          $app.logger().info("Stopping job");
-          stopCameraJob(e.record.id);
-        }
+        $app.logger().info("Stopping job");
+        stopCameraJob(e.record.id);
 
         $app.logger().info("Adding camera to MediaMTX");
         const configuration = JSON.parse(e.record.get("configuration"));
