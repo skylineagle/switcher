@@ -1,9 +1,8 @@
 import { CameraConfiguration } from "@/types/types";
 import { logger } from "./logger";
+import { MEDIAMTX_API } from "@/config";
 
-const MEDIAMTX_API = `${
-  process.env.MEDIAMTX_API || "http://localhost:9997"
-}/v3`;
+export const API_URL = `${MEDIAMTX_API}/v3`;
 
 export async function addMediaMTXPath(
   name: string,
@@ -12,7 +11,7 @@ export async function addMediaMTXPath(
   logger.info(
     `Adding MediaMTX path for camera ${name} with source ${configuration.source}`
   );
-  const response = await fetch(`${MEDIAMTX_API}/config/paths/add/${name}`, {
+  const response = await fetch(`${API_URL}/config/paths/add/${name}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,7 +26,7 @@ export async function addMediaMTXPath(
 
 export async function removeMediaMTXPath(name: string) {
   logger.info(`Removing MediaMTX path for camera ${name}`);
-  const response = await fetch(`${MEDIAMTX_API}/config/paths/delete/${name}`, {
+  const response = await fetch(`${API_URL}/config/paths/delete/${name}`, {
     method: "DELETE",
   });
 
@@ -39,7 +38,7 @@ export async function removeMediaMTXPath(name: string) {
 }
 
 export async function getMediaMTXPaths() {
-  const response = await fetch(`${MEDIAMTX_API}/paths/list`);
+  const response = await fetch(`${API_URL}/paths/list`);
 
   if (!response.ok) {
     throw new Error(`Failed to get MediaMTX paths: ${response.statusText}`);

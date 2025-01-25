@@ -1,6 +1,5 @@
-import PocketBase from "pocketbase";
+import { POCKETBASE_URL } from "@/config";
 import { TypedPocketBase } from "@/types/db.types";
+import PocketBase from "pocketbase";
 
-export const pb = new PocketBase(
-  process.env.POCKETBASE_URL || "http://127.0.0.1:8090"
-) as TypedPocketBase;
+export const pb = new PocketBase(POCKETBASE_URL) as TypedPocketBase;
