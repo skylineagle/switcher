@@ -6,3 +6,5 @@ export const pb = new PocketBase(
 ) as TypedPocketBase;
 
 console.log(import.meta.env.VITE_POCKETBASE_URL);
+console.log(import.meta.env.VITE_BAKER_URL);
+console.log(import.meta.env.VITE_STREAM_URL);
