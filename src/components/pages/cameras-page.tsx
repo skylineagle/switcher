@@ -123,7 +123,7 @@ export function CamerasPage() {
                           <SelectItem
                             key={mode}
                             value={mode}
-                            disabled={mode === "auto" && !camera.configuration}
+                            disabled={mode === "auto" && !camera.automation}
                           >
                             {mode}
                           </SelectItem>
