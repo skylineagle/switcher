@@ -1,15 +1,16 @@
 services:
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
+    container_name: pocketbase
     restart: unless-stopped
     ports:
       - "8090:8090"
     volumes:
-      - pb_data:/pb_data
+      - ./pocketbase/pb_data:/pb_data
       - ./pocketbase/pb_public:/pb_public
       - ./pocketbase/pb_hooks:/pb_hooks
       - ./pocketbase/pb_migrations:/pb_migrations
-    healthcheck:
+    healthcheck: # optional, recommended since v0.10.0
       test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
       interval: 5s
       timeout: 5s
@@ -19,6 +20,7 @@ services:
 
   mediamtx:
     image: bluenviron/mediamtx:latest
+    container_name: mediamtx
     restart: unless-stopped
     ports:
       - "9997:9997" # API
@@ -31,34 +33,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${TAG:-latest}
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - pocketbase
-    networks:
-      - app-network
-
-  baker:
-    image: ghcr.io/${GITHUB_REPOSITORY}/baker:${TAG:-latest}
-    build:
-      context: .
-      dockerfile: Dockerfile.baker
-    restart: unless-stopped
-    depends_on:
-      - pocketbase
-      - mediamtx
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  pb_data:

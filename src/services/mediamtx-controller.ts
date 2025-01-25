@@ -1,7 +1,7 @@
 import { CameraConfiguration } from "@/types/types";
 import { logger } from "./logger";
 
-const MEDIAMTX_API = "http://localhost:9997/v3";
+const MEDIAMTX_API = `${Bun.env.MEDIAMTX_API || "http://localhost:9997"}/v3`;
 
 export async function addMediaMTXPath(
   name: string,
