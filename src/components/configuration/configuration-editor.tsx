@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { cameraConfigSchema } from "./consts";
 import { EditorMarker } from "./types";
+import { useTheme } from "../theme-provider";
 
 export interface ConfigurationEditorProps {
   camera: CamerasResponse;
@@ -28,6 +29,7 @@ export interface ConfigurationEditorProps {
 
 export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
   const queryClient = useQueryClient();
+  const { theme } = useTheme();
   const [editingConfig, setEditingConfig] = useState<{
     id: string;
     config: string;
@@ -163,6 +165,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
           <TabsContent value="config" className="py-4">
             <Editor
               height="400px"
+              theme={theme === "dark" ? "vs-dark" : "light"}
               defaultLanguage="json"
               value={editingConfig?.config ?? ""}
               onChange={(value) =>
