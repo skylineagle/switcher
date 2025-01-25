@@ -1,33 +1,44 @@
 import { Label } from "@radix-ui/react-label";
 import type React from "react";
+import { Badge } from "./badge";
+import { cn } from "@/lib/utils";
+import { Camera } from "@/types/types";
+
+const sizeClasses = {
+  small: "w-2 h-2",
+  medium: "w-3 h-3",
+  large: "w-4 h-4",
+};
 
 interface LiveIndicatorProps {
   size?: "small" | "medium" | "large";
-  color?: string;
+  status: Omit<Camera["status"], "off">;
 }
 
 const LiveIndicator: React.FC<LiveIndicatorProps> = ({
   size = "medium",
-  color = "bg-red-500",
+  status,
 }) => {
-  const sizeClasses = {
-    small: "w-2 h-2",
-    medium: "w-3 h-3",
-    large: "w-4 h-4",
-  };
-
   return (
-    <div className="flex items-center space-x-2">
+    <Badge
+      variant="default"
+      className={cn(
+        "space-x-2",
+        status === "on" ? "bg-red-500" : "bg-yellow-500"
+      )}
+    >
       <div className={`relative ${sizeClasses[size]}`}>
         <div
-          className={`absolute inset-0 ${color} rounded-full animate-ping`}
+          className={`absolute inset-0 bg-current rounded-full animate-ping`}
         ></div>
         <div
-          className={`relative ${sizeClasses[size]} ${color} rounded-full`}
+          className={`relative ${sizeClasses[size]} bg-current rounded-full`}
         ></div>
       </div>
-      <Label className="text-sm">Live</Label>
-    </div>
+      <Label className="text-sm">
+        {status === "on" ? "Live" : "Waiting for stream"}
+      </Label>
+    </Badge>
   );
 };
 

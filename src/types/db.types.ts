@@ -91,6 +91,12 @@ export enum CamerasModeOptions {
 	"offline" = "offline",
 	"auto" = "auto",
 }
+
+export enum CamerasStatusOptions {
+	"off" = "off",
+	"on" = "on",
+	"waiting" = "waiting",
+}
 export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
 	automation?: null | Tautomation
 	configuration: null | Tconfiguration
@@ -98,7 +104,7 @@ export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
 	id: string
 	mode: CamerasModeOptions
 	name?: string
-	status?: boolean
+	status?: CamerasStatusOptions
 	updated?: IsoDateString
 }
 

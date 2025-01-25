@@ -139,22 +139,32 @@ export async function getNextExecution(camera: string): Promise<Date> {
 async function updateStatus() {
   const cameras = await pb.collection("cameras").getFullList();
   const pathList = await getMediaMTXPaths();
-  const paths = pathList.items.map((path: { name: string }) => path.name);
+  const paths = pathList.items;
 
   for (const camera of cameras) {
     const status = paths.includes(camera.name);
-    await pb.collection("cameras").update(camera.id, { status });
+
+    await pb.collection("cameras").update(camera.id, {
+      status: status
+        ? paths.find(
+            (path: { name: string; ready: boolean }) =>
+              path.name === camera.name
+          ).ready
+          ? "on"
+          : "waiting"
+        : "off",
+    });
   }
 }
 
 baker.add({
   name: "live-status",
-  cron: "@every_10_seconds",
+  cron: "@every_5_seconds",
   start: true,
   callback: async () => {
     await updateStatus();
   },
   onTick: () => {
-    logger.info("Updating status of cameras");
+    logger.debug("Updating status of cameras");
   },
 });

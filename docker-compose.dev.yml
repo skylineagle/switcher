@@ -33,6 +33,19 @@ services:
     networks:
       - app-network
 
+  mediamtx-2:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx-2
+    restart: unless-stopped
+    ports:
+      - "9554:8554" # RTSP
+      - "9889:8889" # WEBRTC
+      - "9888:8888" # HLS
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

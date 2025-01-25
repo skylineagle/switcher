@@ -34,8 +34,6 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
         (new Date(data?.nextExecution).getTime() - new Date().getTime()) / 1000
       );
 
-      console.log("seconds until:", secondsUntilNextExecution);
-
       if (secondsUntilNextExecution < camera.automation.minutesOff * 60) {
         return { countdownTime: secondsUntilNextExecution, until: "on" };
       } else {
@@ -53,8 +51,6 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
   if (camera.mode !== "auto" || !camera.automation) {
     return null;
   }
-
-  console.log(data);
 
   return (
     <div className="text-sm text-muted-foreground">

@@ -23,17 +23,26 @@ function updateStatus() {
 
     const mediamtxPaths = response.json;
     $app.logger().info(JSON.stringify(mediamtxPaths));
-    const liveCameras = mediamtxPaths.items.map((path) => path.name);
+    const liveCameras = mediamtxPaths.items;
     $app.logger().info(JSON.stringify(liveCameras));
     // Update each camera's status based on whether it's live
     // Update status for each live camera
     for (const camera of cameras) {
       const cameraName = camera.get("name");
-      const cameraStatus = liveCameras.includes(cameraName);
+      const cameraStatus = liveCameras
+        .map((path) => path.name)
+        .includes(cameraName);
       $app
         .logger()
         .info(`Updating Camera ${cameraName} status to: ${cameraStatus}`);
-      camera.set("status", cameraStatus);
+      camera.set(
+        "status",
+        cameraStatus
+          ? liveCameras.find((path) => path.name === cameraName).ready
+            ? "on"
+            : "waiting"
+          : "off"
+      );
       $app.save(camera);
     }
   } catch (error) {
