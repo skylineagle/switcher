@@ -1,4 +1,4 @@
-/// <reference path="../data/types.d.ts" />
+/// <reference path="../pb_data/types.d.ts" />
 
 // Handle adter sucessful creation
 onRecordAfterCreateSuccess((e) => {
