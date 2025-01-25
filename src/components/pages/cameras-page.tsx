@@ -100,11 +100,11 @@ export function CamerasPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cameras?.map((camera: CamerasResponse) => {
+            {cameras?.map((camera) => {
               return (
                 <TableRow key={camera.id}>
                   <TableCell>{camera.name || "Unnamed Camera"}</TableCell>
-                  <TableCell>{camera.source}</TableCell>
+                  <TableCell>{camera.configuration?.source}</TableCell>
                   <TableCell>
                     <Select
                       value={camera.mode}

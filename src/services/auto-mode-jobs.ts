@@ -1,5 +1,5 @@
 import { pb } from "@/lib/pocketbase";
-import { CameraConfiguration } from "@/types/types";
+import { CameraAutomation, CamerasResponse } from "@/types/types";
 import { Baker, Status } from "cronbake";
 import { logger } from "./logger";
 import {
@@ -12,17 +12,19 @@ const baker = Baker.create();
 
 async function initializeJobs() {
   try {
-    const cameras = await pb.collection("cameras").getFullList();
+    const cameras = await pb
+      .collection("cameras")
+      .getFullList<CamerasResponse>();
 
     for (const camera of cameras) {
-      const config = camera.configuration as CameraConfiguration;
+      if (camera.automation) {
+        await createJob(camera.id, camera.automation);
+        logger.info(`Initialized job for camera ${camera.id}`);
 
-      await createJob(camera.id, config);
-      logger.info(`Initialized job for camera ${camera.id}`);
-
-      if (camera.mode === "auto") {
-        logger.info(`Starting job for camera ${camera.id} on auto mode`);
-        await startJob(camera.id);
+        if (camera.mode === "auto") {
+          logger.info(`Starting job for camera ${camera.id} on auto mode`);
+          await startJob(camera.id);
+        }
       }
     }
 
@@ -38,28 +40,34 @@ initializeJobs();
 
 export async function createJob(
   camera: string,
-  configuration: CameraConfiguration
+  automation: CameraAutomation
 ): Promise<void> {
   try {
     logger.info(`Creating job for camera ${camera}`);
     baker.add({
       name: camera,
-      cron: `@every_${
-        configuration.minutesOn + configuration.minutesOff
-      }_minutes`,
+      cron: `@every_${automation.minutesOn + automation.minutesOff}_seconds`,
       start: false,
       callback: async () => {
         // Turn camera on
         logger.info(`Starting automation routinefor camera ${camera}`);
-        const data = await pb.collection("cameras").getOne(camera);
-        await addMediaMTXPath(data.name, data.source);
+        const data = await pb
+          .collection("cameras")
+          .getOne<CamerasResponse>(camera);
+        if (!data.configuration) {
+          throw new Error("Camera configuration is null");
+        }
+
+        await addMediaMTXPath(data.name, data.configuration);
+        updateStatus();
         logger.info(`Camera ${camera} turned on`);
         // Keep camera on for specified duration
         setTimeout(async () => {
           // Turn camera off after duration
           await removeMediaMTXPath(data.name);
+          updateStatus();
           logger.info(`Camera ${camera} turned off`);
-        }, configuration.minutesOn * 60 * 1000);
+        }, automation.minutesOn * 1000);
       },
     });
   } catch (error) {
@@ -130,12 +138,12 @@ async function updateStatus() {
 
 baker.add({
   name: "live-status",
-  cron: "@every_5_seconds",
+  cron: "@every_10_seconds",
   start: true,
   callback: async () => {
     await updateStatus();
   },
   onTick: () => {
-    logger.info("Updating camera statuses");
+    logger.info("Updating status of cameras");
   },
 });

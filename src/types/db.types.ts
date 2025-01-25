@@ -91,13 +91,13 @@ export enum CamerasModeOptions {
 	"offline" = "offline",
 	"auto" = "auto",
 }
-export type CamerasRecord<Tconfiguration = unknown> = {
-	configuration?: null | Tconfiguration
+export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
+	automation?: null | Tautomation
+	configuration: null | Tconfiguration
 	created?: IsoDateString
 	id: string
 	mode: CamerasModeOptions
 	name?: string
-	source?: string
 	status?: boolean
 	updated?: IsoDateString
 }
@@ -121,7 +121,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CamerasResponse<Tconfiguration = unknown, Texpand = unknown> = Required<CamerasRecord<Tconfiguration>> & BaseSystemFields<Texpand>
+export type CamerasResponse<Tautomation = unknown, Tconfiguration = unknown, Texpand = unknown> = Required<CamerasRecord<Tautomation, Tconfiguration>> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions

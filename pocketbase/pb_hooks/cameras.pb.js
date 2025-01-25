@@ -2,25 +2,21 @@
 
 // Handle adter sucessful creation
 onRecordAfterCreateSuccess((e) => {
+  const { createCameraJob } = require(`${__hooks}/job.utils`);
   $app.logger().info(`Camera created with ID: ${e.record.id}`);
-  const configuration = JSON.parse(e.record.get("configuration"));
-  $app.logger().info(configuration);
+  const automation = JSON.parse(e.record.get("automation"));
+  $app.logger().info(automation);
 
-  if (!configuration) {
-    $app.logger().warn(`No configuration found for camera ${e.record.id}`);
+  if (!automation) {
+    $app
+      .logger()
+      .warn(`No automation settings found for camera ${e.record.id}`);
     e.next();
     return;
   }
 
   try {
-    $http.send({
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      url: `http://host.docker.internal:3000/jobs/${e.record.id}`,
-      body: JSON.stringify(configuration),
-    });
+    createCameraJob(e.record.id, automation);
   } catch (error) {
     $app.logger().error(error);
   }
@@ -29,30 +25,32 @@ onRecordAfterCreateSuccess((e) => {
 
 // Handle after successful update
 onRecordUpdateRequest((e) => {
+  const {
+    createCameraJob,
+    startCameraJob,
+    stopCameraJob,
+    getJobStatus,
+  } = require(`${__hooks}/job.utils`);
+  const {
+    addMediaMTXPath,
+    deleteMediaMTXPath,
+  } = require(`${__hooks}/mediamtx.utils`);
   const { updateStatus } = require(`${__hooks}/utils`);
+
   $app.logger().info(`Camera updated request with ID: ${e.record.id}`);
   const current = $app.findRecordById("cameras", e.record.id);
   const name = e.record.get("name");
   const mode = e.record.get("mode");
-  const source = e.record.get("source");
-  const configuration = e.record.get("configuration");
+  const automation = e.record.get("automation");
 
-  // On Configuration Change
+  // On Automation Settings Change
   if (
-    configuration &&
-    JSON.stringify(configuration) !==
-      JSON.stringify(current.get("configuration"))
+    automation &&
+    JSON.stringify(automation) !== JSON.stringify(current.get("automation"))
   ) {
-    $app.logger().info("Configuration changed, syncing baker job");
+    $app.logger().info("Automation settings changed, syncing baker job");
     try {
-      $http.send({
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        url: `http://host.docker.internal:3000/jobs/${e.record.id}`,
-        body: JSON.stringify(configuration),
-      });
+      createCameraJob(e.record.id, automation);
     } catch (error) {
       $app.logger().error("Failed to sync baker job", error);
     }
@@ -64,56 +62,27 @@ onRecordUpdateRequest((e) => {
     try {
       // If mode changed to auto, create and start job
       if (mode === "auto") {
-        $http.send({
-          method: "DELETE",
-          url: `http://mediamtx:9997/v3/config/paths/delete/${name}`,
-        });
-
-        $http.send({
-          method: "POST",
-          url: `http://host.docker.internal:3000/jobs/${e.record.id}/start`,
-        });
+        deleteMediaMTXPath(name);
+        startCameraJob(e.record.id);
       } else if (mode === "live") {
-        const statusResponse = $http.send({
-          method: "GET",
-          url: `http://host.docker.internal:3000/jobs/${e.record.id}`,
-        });
-        $app
-          .logger()
-          .info(`Job status: ${JSON.stringify(statusResponse.json.status)}`);
+        const status = getJobStatus(e.record.id);
 
-        const status = statusResponse.json.status;
         if (status === "running") {
           $app.logger().info("Stopping job");
-          $http.send({
-            method: "POST",
-            url: `http://host.docker.internal:3000/jobs/${e.record.id}/stop`,
-          });
+          stopCameraJob(e.record.id);
         }
 
         $app.logger().info("Adding camera to MediaMTX");
-        $http.send({
-          method: "POST",
-          url: `http://mediamtx:9997/v3/config/paths/add/${name}`,
-          body: JSON.stringify({
-            name,
-            source,
-          }),
-        });
+        const configuration = JSON.parse(e.record.get("configuration"));
+        addMediaMTXPath(name, configuration);
       }
       // If mode changed to off or live, stop and delete job
       else {
         $app.logger().info("Stopping job");
-        $http.send({
-          method: "POST",
-          url: `http://host.docker.internal:3000/jobs/${e.record.id}/stop`,
-        });
+        stopCameraJob(e.record.id);
 
         $app.logger().info("Removing camera from MediaMTX");
-        $http.send({
-          method: "DELETE",
-          url: `http://mediamtx:9997/v3/config/paths/delete/${name}`,
-        });
+        deleteMediaMTXPath(name);
       }
     } catch (error) {
       $app.logger().error(error);
@@ -126,27 +95,18 @@ onRecordUpdateRequest((e) => {
 
 // Handle after successful deletion
 onRecordAfterDeleteSuccess((e) => {
+  const { stopCameraJob, deleteCameraJob } = require(`${__hooks}/job.utils`);
+  const { deleteMediaMTXPath } = require(`${__hooks}/mediamtx.utils`);
+
   $app.logger().info(`Camera deleted with ID: ${e.record.id}`);
 
   try {
     // Stop and delete any existing job
-    $http.send({
-      method: "POST",
-      url: `http://host.docker.internal:3000/jobs/${e.record.id}/stop`,
-    });
-    $http.send({
-      method: "DELETE",
-      url: `http://host.docker.internal:3000/jobs/${e.record.id}`,
-    });
-
-    $http.send({
-      method: "DELETE",
-      url: `http://mediamtx:9997/v3/config/paths/remove/${e.record.get(
-        "name"
-      )}`,
-    });
+    stopCameraJob(e.record.id);
+    deleteCameraJob(e.record.id);
+    deleteMediaMTXPath(e.record.get("name"));
   } catch (error) {
-    $app.logger().error(`Error deleting job for camera ${e.record.id}:`, error);
+    $app.logger().error(error);
   }
 
   e.next();

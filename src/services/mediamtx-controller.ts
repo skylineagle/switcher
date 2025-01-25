@@ -1,18 +1,21 @@
+import { CameraConfiguration } from "@/types/types";
 import { logger } from "./logger";
 
 const MEDIAMTX_API = "http://localhost:9997/v3";
 
-export async function addMediaMTXPath(name: string, source: string) {
-  logger.info(`Adding MediaMTX path for camera ${name} with source ${source}`);
+export async function addMediaMTXPath(
+  name: string,
+  configuration: CameraConfiguration
+) {
+  logger.info(
+    `Adding MediaMTX path for camera ${name} with source ${configuration.source}`
+  );
   const response = await fetch(`${MEDIAMTX_API}/config/paths/add/${name}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      name,
-      source,
-    }),
+    body: JSON.stringify(configuration),
   });
 
   if (!response.ok) {

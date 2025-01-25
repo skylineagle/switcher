@@ -1,4 +1,4 @@
-import { CameraConfiguration } from "@/types/types";
+import { CameraAutomation } from "@/types/types";
 import { Elysia } from "elysia";
 import {
   createJob,
@@ -28,11 +28,11 @@ app.post("/jobs/:camera", async ({ params, body }) => {
   try {
     const { camera } = params;
     const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
-    const config = parsedBody as CameraConfiguration;
+    const automation = parsedBody as CameraAutomation;
 
     logger.info("Creating new job");
-    logger.info(config);
-    await createJob(camera, config);
+    logger.info(automation);
+    await createJob(camera, automation);
 
     return { success: true };
   } catch (error: unknown) {
