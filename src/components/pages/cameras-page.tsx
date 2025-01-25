@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -19,9 +18,14 @@ import { pb } from "@/lib/pocketbase";
 import { getCameras, updateCamera } from "@/services/cameras";
 import { CamerasModeOptions, CamerasResponse } from "@/types/db.types";
 import { UpdateCamera } from "@/types/types";
+import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { ConfigurationEditor } from "../configuration/configuration-editor";
+import { DeleteCamera } from "../delete-camera/delete-camera";
+import { StatusIndicator } from "../status-indicator";
+import { StreamLink } from "../stream-link";
 
 export function CamerasPage() {
   const queryClient = useQueryClient();
@@ -31,16 +35,16 @@ export function CamerasPage() {
     queryFn: getCameras,
   });
 
-  const { mutate: updateCameraMutation } = useMutation({
+  const { mutate: updateCameraModeMutation } = useMutation({
     mutationFn: async (data: UpdateCamera) => {
       await updateCamera(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cameras"] });
-      toast.success("Camera updated successfully");
+      toast.success("Camera mode updated successfully");
     },
     onError: (error) => {
-      toast.error("Failed to update camera: " + error.message);
+      toast.error("Failed to update camera mode: " + error.message);
     },
   });
 
@@ -92,24 +96,27 @@ export function CamerasPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Mode</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Configuration</TableHead>
+              <TableHead className="w-[30%]">Name</TableHead>
+              <TableHead className="w-[25%]">Mode</TableHead>
+              <TableHead className="w-[20%]">Status</TableHead>
+              <TableHead className="w-[25%]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {cameras?.map((camera) => {
               return (
                 <TableRow key={camera.id}>
-                  <TableCell>{camera.name || "Unnamed Camera"}</TableCell>
-                  <TableCell>{camera.configuration?.source}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Label>{camera.name || "Unnamed Camera"}</Label>
+                      <StreamLink camera={camera} />
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Select
                       value={camera.mode}
                       onValueChange={(value: CamerasModeOptions) => {
-                        updateCameraMutation({
+                        updateCameraModeMutation({
                           id: camera.id,
                           mode: value,
                         });
@@ -132,16 +139,13 @@ export function CamerasPage() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={camera.status ? "default" : "secondary"}>
-                      {camera.status ? "On" : "Off"}
-                    </Badge>
+                    <StatusIndicator status={camera.status} />
                   </TableCell>
                   <TableCell>
-                    <pre className="text-xs">
-                      {camera.configuration
-                        ? JSON.stringify(camera.configuration, null, 2)
-                        : "No configuration"}
-                    </pre>
+                    <div className="flex gap-2">
+                      <ConfigurationEditor camera={camera} />
+                      <DeleteCamera camera={camera} />
+                    </div>
                   </TableCell>
                 </TableRow>
               );

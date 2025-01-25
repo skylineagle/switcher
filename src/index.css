@@ -2,76 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-@layer base {
+/* @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -124,6 +55,70 @@ button:focus-visible {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  }
+} */
+
+@layer base {
+  :root {
+    --background: 210 8% 95%;
+    --foreground: 210 8% 5%;
+
+    --card: 210 8% 95%;
+    --card-foreground: 210 8% 5%;
+
+    --popover: 210 8% 95%;
+    --popover-foreground: 210 8% 5%;
+
+    --primary: 207 37% 40%;
+    --primary-foreground: 180 9% 98%;
+
+    --secondary: 204 11% 91%;
+    --secondary-foreground: 210 8% 5%;
+
+    --muted: 210 9% 91%;
+    --muted-foreground: 206 9% 45%;
+
+    --accent: 204 11% 91%;
+    --accent-foreground: 210 8% 5%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 9% 87%;
+    --input: 207 9% 81%;
+    --ring: 207 36% 72%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 200 7% 8%;
+    --foreground: 180 9% 98%;
+
+    --card: 180 6% 10%;
+    --card-foreground: 180 9% 98%;
+
+    --popover: 180 6% 10%;
+    --popover-foreground: 180 9% 98%;
+
+    --primary: 192 22% 49%;
+    --primary-foreground: 240 9% 2%;
+
+    --secondary: 195 8% 19%;
+    --secondary-foreground: 180 9% 98%;
+
+    --muted: 191 7% 29%;
+    --muted-foreground: 192 8% 49%;
+
+    --accent: 192 71% 19%;
+    --accent-foreground: 180 9% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 192 8% 12%;
+    --input: 195 9% 18%;
+    --ring: 192 23% 40%;
   }
 }
 

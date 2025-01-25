@@ -1,0 +1,207 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { updateCamera } from "@/services/cameras";
+import { CamerasResponse, UpdateCamera } from "@/types/types";
+import Editor, { type OnMount } from "@monaco-editor/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Pencil } from "lucide-react";
+import type * as Monaco from "monaco-editor";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { cameraConfigSchema } from "./consts";
+import { EditorMarker } from "./types";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CameraAutomation } from "@/types/types";
+
+export interface ConfigurationEditorProps {
+  camera: CamerasResponse;
+}
+
+export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
+  const queryClient = useQueryClient();
+  const [editingConfig, setEditingConfig] = useState<{
+    id: string;
+    config: string;
+    automation: CameraAutomation | null;
+  } | null>(null);
+  const [isValid, setIsValid] = useState(true);
+  const monacoRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  const { mutate: updateCameraMutation } = useMutation({
+    mutationFn: async (data: UpdateCamera) => {
+      await updateCamera(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cameras"] });
+      toast.success("Camera updated successfully");
+      setEditingConfig(null);
+    },
+    onError: (error) => {
+      toast.error("Failed to update camera: " + error.message);
+    },
+  });
+
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
+    monacoRef.current = editor;
+
+    // Configure JSON schema
+    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+      validate: true,
+      schemas: [
+        {
+          uri: "http://myschema/camera-config.json",
+          fileMatch: ["*"],
+          schema: cameraConfigSchema,
+        },
+      ],
+      enableSchemaRequest: false,
+    });
+  };
+
+  function handleEditorValidation(markers: EditorMarker[]) {
+    setIsValid(markers.length === 0);
+  }
+
+  return (
+    <Dialog
+      open={editingConfig?.id === camera.id}
+      onOpenChange={(open: boolean) => {
+        if (!open) setEditingConfig(null);
+        else
+          setEditingConfig({
+            id: camera.id,
+            config: JSON.stringify(camera.configuration, null, 2),
+            automation: camera.automation,
+          });
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Pencil className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Camera Settings</DialogTitle>
+          <DialogDescription>
+            Configure camera settings and automation.
+          </DialogDescription>
+        </DialogHeader>
+        <Tabs defaultValue="automation">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="automation">Automation</TabsTrigger>
+            <TabsTrigger value="config">Configuration</TabsTrigger>
+          </TabsList>
+          <TabsContent value="config" className="py-4">
+            <Editor
+              height="400px"
+              defaultLanguage="json"
+              value={editingConfig?.config ?? ""}
+              onChange={(value) =>
+                setEditingConfig((prev) =>
+                  prev ? { ...prev, config: value ?? "" } : null
+                )
+              }
+              onMount={handleEditorDidMount}
+              onValidate={handleEditorValidation}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: "on",
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                formatOnPaste: true,
+                formatOnType: true,
+                quickSuggestions: true,
+                suggestOnTriggerCharacters: true,
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="automation" className="py-4">
+            <div className="grid gap-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="minutesOn"
+                  className="text-right text-sm font-medium"
+                >
+                  Minutes On
+                </Label>
+                <Input
+                  id="minutesOn"
+                  type="number"
+                  className="col-span-3"
+                  value={editingConfig?.automation?.minutesOn ?? 0}
+                  onChange={(e) =>
+                    setEditingConfig((prev) => ({
+                      ...prev!,
+                      automation: {
+                        minutesOn: parseInt(e.target.value),
+                        minutesOff: prev?.automation?.minutesOff ?? 0,
+                      },
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="minutesOff"
+                  className="text-right text-sm font-medium"
+                >
+                  Minutes Off
+                </Label>
+                <Input
+                  id="minutesOff"
+                  type="number"
+                  className="col-span-3"
+                  value={editingConfig?.automation?.minutesOff ?? 0}
+                  onChange={(e) =>
+                    setEditingConfig((prev) => ({
+                      ...prev!,
+                      automation: {
+                        minutesOn: prev?.automation?.minutesOn ?? 0,
+                        minutesOff: parseInt(e.target.value),
+                      },
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setEditingConfig(null)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (!editingConfig || !isValid) return;
+              try {
+                const parsedConfig = JSON.parse(editingConfig.config);
+                updateCameraMutation({
+                  id: editingConfig.id,
+                  configuration: parsedConfig,
+                  automation: editingConfig.automation,
+                });
+              } catch {
+                toast.error("Invalid JSON configuration");
+              }
+            }}
+            disabled={!isValid}
+          >
+            Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
