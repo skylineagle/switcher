@@ -1,113 +1,170 @@
-import { CameraAutomation } from "@/types/types";
-import { Elysia } from "elysia";
-import {
-  createJob,
-  deleteJob,
-  getJobStatus,
-  getNextExecution,
-  startJob,
-  stopJob,
-} from "./auto-mode-jobs";
+import { pb } from "@/services/baker/pocketbase";
+import { CameraAutomation, CamerasResponse } from "@/types/types";
+import { Baker, Status } from "cronbake";
 import { logger } from "./logger";
+import {
+  addMediaMTXPath,
+  getMediaMTXPaths,
+  removeMediaMTXPath,
+} from "./mediamtx-controller";
 
-const app = new Elysia()
-  .onError(({ code, error, request }) => {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    logger.error({ code, error, path: request.url }, "Request error occurred");
-    return { success: false, error: errorMessage };
-  })
-  .onRequest(({ request }) => {
-    logger.info(
-      { method: request.method, path: request.url },
-      "Incoming request"
-    );
-  });
+const baker = Baker.create();
 
-app.post("/jobs/:camera", async ({ params, body }) => {
+async function initializeJobs() {
   try {
-    const { camera } = params;
-    const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
-    const automation = parsedBody as CameraAutomation;
+    const cameras = await pb
+      .collection("cameras")
+      .getFullList<CamerasResponse>();
 
-    logger.info("Creating new job");
-    logger.info(automation);
-    await createJob(camera, automation);
+    logger.info(`Found ${cameras.length} cameras`);
+    for (const camera of cameras) {
+      if (camera.automation) {
+        await createJob(camera.id, camera.automation);
+        logger.info(`Initialized job for camera ${camera.id}`);
 
-    return { success: true };
-  } catch (error: unknown) {
-    logger.error(error);
-    logger.error("Failed to create job", { camera: params.camera, error });
-    if (error instanceof Error) return { success: false, error: error.message };
-    return { success: false, error: "An unknown error occurred" };
+        if (camera.mode === "auto") {
+          logger.info(`Starting job for camera ${camera.id} on auto mode`);
+          await startJob(camera.id);
+        } else if (camera.mode === "live") {
+          if (camera.configuration) {
+            logger.info(`Starting job for camera ${camera.id} on live mode`);
+            await addMediaMTXPath(camera.name, camera.configuration);
+          }
+        }
+      }
+    }
+
+    logger.info("All camera jobs initialized successfully");
+  } catch (error) {
+    logger.error("Failed to initialize camera jobs", error);
+    throw error;
   }
-});
+}
 
-app.post("/jobs/:camera/start", async ({ params }) => {
+// Initialize jobs on startup
+initializeJobs();
+
+export async function createJob(
+  camera: string,
+  automation: CameraAutomation
+): Promise<void> {
   try {
-    const { camera } = params;
-    logger.info({ camera }, "Starting job");
-    await startJob(camera);
-    return { success: true };
-  } catch (error: unknown) {
-    logger.error("Failed to start job", { camera: params.camera, error });
-    if (error instanceof Error) return { success: false, error: error.message };
-    return { success: false, error: "An unknown error occurred" };
-  }
-});
+    logger.info(`Creating job for camera ${camera}`);
+    baker.add({
+      name: camera,
+      cron: `@every_${automation.minutesOn + automation.minutesOff}_minutes`,
+      start: false,
+      callback: async () => {
+        // Turn camera on
+        logger.info(`Starting automation routine for camera ${camera}`);
+        const data = await pb
+          .collection("cameras")
+          .getOne<CamerasResponse>(camera);
+        if (!data.configuration) {
+          throw new Error("Camera configuration is null");
+        }
 
-app.post("/jobs/:camera/stop", async ({ params }) => {
+        await addMediaMTXPath(data.name, data.configuration);
+        updateStatus();
+        logger.info(`Camera ${camera} turned on`);
+
+        // Keep camera on for specified duration
+        setTimeout(async () => {
+          if (baker.isRunning(camera)) {
+            // Turn camera off after duration
+            await removeMediaMTXPath(data.name);
+            updateStatus();
+            logger.info(`Camera ${camera} turned off`);
+          } else {
+            logger.info(`Job for camera ${camera} is not running, skipping`);
+          }
+        }, automation.minutesOn * 60 * 1000);
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function startJob(camera: string): Promise<void> {
   try {
-    const { camera } = params;
-    logger.info({ camera }, "Stopping job");
-    await stopJob(camera);
-    return { success: true };
-  } catch (error: unknown) {
-    logger.error("Failed to stop job", { camera: params.camera, error });
-    if (error instanceof Error) return { success: false, error: error.message };
-    return { success: false, error: "An unknown error occurred" };
+    baker.bake(camera);
+    logger.info(`Job for camera ${camera} started`);
+    logger.debug(baker.getStatus(camera));
+    logger.debug(baker.isRunning(camera));
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
-});
+}
 
-app.get("/jobs/:camera", ({ params }) => {
+export async function stopJob(camera: string): Promise<void> {
   try {
-    const { camera } = params;
-    const status = getJobStatus(camera);
-    logger.info("Retrieved job status", { camera, status });
-    return { success: true, status };
-  } catch (error: unknown) {
-    logger.error("Failed to get job status", { camera: params.camera, error });
-    if (error instanceof Error) return { success: false, error: error.message };
-    return { success: false, error: "An unknown error occurred" };
+    baker.stop(camera);
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
-});
+}
 
-app.delete("/jobs/:camera", async ({ params }) => {
+export function getJobStatus(camera: string): Status | undefined {
   try {
-    const { camera } = params;
-    logger.info({ camera }, "Deleting job");
-    await deleteJob(camera);
-    return { success: true };
-  } catch (error: unknown) {
-    logger.error("Failed to delete job", { camera: params.camera, error });
-    if (error instanceof Error) return { success: false, error: error.message };
-    return { success: false, error: "An unknown error occurred" };
+    return baker.getStatus(camera);
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
-});
+}
 
-app.get("/jobs/:camera/next", async ({ params }) => {
-  const { camera } = params;
-  const nextExecution = await getNextExecution(camera);
-  const status = getJobStatus(camera);
-  return {
-    success: true,
-    nextExecution: nextExecution.toString(),
-    status,
-  };
-});
+export async function deleteJob(camera: string): Promise<void> {
+  try {
+    baker.stop(camera);
+    baker.remove(camera);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
-app.listen(3000);
-logger.info("🦊 Baker API server running at http://localhost:3000");
-logger.debug(`Pocketbase URL: ${process.env.VITE_POCKETBASE_URL}`);
-logger.debug(`Stream URL: ${process.env.VITE_STREAM_URL}`);
-logger.debug(`Baker URL: ${process.env.VITE_BAKER_URL}`);
+export async function getNextExecution(camera: string): Promise<Date> {
+  try {
+    return baker.nextExecution(camera);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+async function updateStatus() {
+  const cameras = await pb.collection("cameras").getFullList();
+  const pathList = await getMediaMTXPaths();
+  const paths = pathList.items;
+
+  for (const camera of cameras) {
+    const status = paths.includes(camera.name);
+
+    await pb.collection("cameras").update(camera.id, {
+      status: status
+        ? paths.find(
+            (path: { name: string; ready: boolean }) =>
+              path.name === camera.name
+          ).ready
+          ? "on"
+          : "waiting"
+        : "off",
+    });
+  }
+}
+
+baker.add({
+  name: "live-status",
+  cron: "@every_5_seconds",
+  start: true,
+  callback: async () => {
+    await updateStatus();
+  },
+  onTick: () => {
+    logger.debug("Updating status of cameras");
+  },
+});

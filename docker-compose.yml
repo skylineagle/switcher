@@ -35,7 +35,7 @@ services:
       - app-network
 
   app:
-    image: ghcr.io/skylineagle/switcher/app:main
+    image: ghcr.io/skylineagle/switcher/app:v1.0.0
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,7 +48,7 @@ services:
       - app-network
 
   baker:
-    image: ghcr.io/skylineagle/switcher/baker:main
+    image: ghcr.io/skylineagle/switcher/baker:v1.0.0
     build:
       context: .
       dockerfile: Dockerfile.baker

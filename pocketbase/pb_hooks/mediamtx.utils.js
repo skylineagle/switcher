@@ -13,6 +13,14 @@ function addMediaMTXPath(name, configuration) {
   });
 }
 
+function updateMediaMTXPath(name, configuration) {
+  $http.send({
+    method: "PUT",
+    url: `${MEDIAMTX_API}/v3/config/paths/update/${name}`,
+    body: JSON.stringify({ name, ...configuration }),
+  });
+}
+
 function deleteMediaMTXPath(name) {
   const response = $http.send({
     method: "DELETE",
@@ -24,4 +32,5 @@ function deleteMediaMTXPath(name) {
 module.exports = {
   addMediaMTXPath,
   deleteMediaMTXPath,
+  updateMediaMTXPath,
 };

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "db:generate": "pocketbase-typegen -d ./pocketbase/pb_data/data.db -o ./src/types/db.types.ts",
-    "baker": "bun run --watch src/services/baker/baker.ts"
+    "baker": "bun run --watch src/services/baker/index.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
