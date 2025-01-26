@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAuthStore } from "@/services/auth";
 import { deleteCamera } from "@/services/cameras";
 import { CamerasResponse } from "@/types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function DeleteCamera({ camera }: { camera: CamerasResponse }) {
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const { mutate: deleteCameraMutation } = useMutation({
     mutationFn: async (id: string) => {
@@ -32,7 +34,7 @@ export function DeleteCamera({ camera }: { camera: CamerasResponse }) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger disabled>
+      <AlertDialogTrigger disabled={user?.level === "user"}>
         <Trash2 className="h-4 w-4 text-destructive" />
       </AlertDialogTrigger>
       <AlertDialogContent>

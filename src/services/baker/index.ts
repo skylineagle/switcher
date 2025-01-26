@@ -106,8 +106,7 @@ app.get("/jobs/:camera/next", async ({ params }) => {
   };
 });
 
-app.listen(3000);
+app.listen(3001);
 logger.info("🦊 Baker API server running at http://localhost:3000");
-logger.debug(`Pocketbase URL: ${process.env.POCKETBASE_URL}`);
-logger.debug(`Stream URL: ${process.env.STREAM_URL}`);
-logger.debug(`Baker URL: ${process.env.BAKER_URL}`);
+logger.debug(`Pocketbase URL: ${Bun.env.POCKETBASE_URL}`);
+logger.debug(`Stream URL: ${Bun.env.MEDIAMTX_API}`);
