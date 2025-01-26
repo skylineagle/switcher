@@ -21,7 +21,7 @@ services:
       - app-network
 
   mediamtx:
-    image: bluenviron/mediamtx:v1.11.2
+    image: bluenviron/mediamtx:1.11.2
     restart: unless-stopped
     ports:
       - "9997:9997" # API
@@ -35,7 +35,7 @@ services:
       - app-network
 
   app:
-    image: ghcr.io/skylineagle/switcher/app:v1.0.0
+    image: ghcr.io/skylineagle/switcher/app:v1.1.1
     build:
       context: .
       dockerfile: Dockerfile
@@ -48,7 +48,7 @@ services:
       - app-network
 
   baker:
-    image: ghcr.io/skylineagle/switcher/baker:v1.0.0
+    image: ghcr.io/skylineagle/switcher/baker:v1.1.1
     build:
       context: .
       dockerfile: Dockerfile.baker
