@@ -15,16 +15,13 @@ function updateStatus() {
       url: "http://mediamtx:9997/v3/paths/list",
     });
 
-    $app.logger().info(JSON.stringify(response));
-
     if (response.statusCode !== 200) {
       throw new Error("Failed to fetch MediaMTX paths");
     }
 
     const mediamtxPaths = response.json;
-    $app.logger().info(JSON.stringify(mediamtxPaths));
     const liveCameras = mediamtxPaths.items;
-    $app.logger().info(JSON.stringify(liveCameras));
+
     // Update each camera's status based on whether it's live
     // Update status for each live camera
     for (const camera of cameras) {

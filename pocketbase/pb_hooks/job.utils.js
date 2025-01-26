@@ -14,11 +14,10 @@ function createCameraJob(cameraId, automation) {
 }
 
 function deleteCameraJob(cameraId) {
-  const response = $http.send({
+  $http.send({
     method: "DELETE",
     url: `${BAKER_URL}/jobs/${cameraId}`,
   });
-  $app.logger().info(response.statusCode);
 }
 
 function startCameraJob(cameraId) {
@@ -36,11 +35,10 @@ function stopCameraJob(cameraId) {
 }
 
 function getJobStatus(cameraId) {
-  const response = $http.send({
+  $http.send({
     method: "GET",
     url: `${BAKER_URL}/jobs/${cameraId}`,
   });
-  return response.json.status;
 }
 
 module.exports = {

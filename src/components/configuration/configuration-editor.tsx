@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/services/auth";
 import { updateCamera } from "@/services/cameras";
+import { CamerasModeOptions } from "@/types/db.types";
 import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,6 +47,14 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
 
   const { mutate: updateCameraMutation } = useMutation({
     mutationFn: async (data: UpdateCamera) => {
+      if (
+        (data.configuration || data.automation) &&
+        camera.mode !== CamerasModeOptions.offline
+      ) {
+        throw new Error(
+          "Configuration and automation can only be updated when camera is off"
+        );
+      }
       await updateCamera(data);
     },
     onSuccess: () => {
@@ -143,7 +152,11 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={camera.mode !== CamerasModeOptions.offline}
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
