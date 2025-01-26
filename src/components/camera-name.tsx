@@ -7,6 +7,7 @@ import {
 import { Camera } from "@/types/types";
 import { Label } from "@radix-ui/react-label";
 import { StreamLink } from "./stream-link";
+import { Badge } from "./ui/badge";
 
 export interface CameraNameProps {
   camera: Camera;
@@ -17,7 +18,9 @@ export function CameraName({ camera }: CameraNameProps) {
     <div className="flex items-center gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
-          <Label>{camera.name}</Label>
+          <Badge variant="default">
+            <Label>{camera.name}</Label>
+          </Badge>
         </TooltipTrigger>
         <TooltipContent
           side="right"

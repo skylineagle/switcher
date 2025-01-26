@@ -29,7 +29,6 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
       ) {
         throw new Error("Failed to fetch next execution");
       }
-      console.log(data?.nextExecution);
 
       const secondsUntilNextExecution = Math.floor(
         (new Date(data?.nextExecution).getTime() - new Date().getTime()) / 1000
@@ -40,17 +39,23 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
           countdownTime: new Date(data?.nextExecution).getTime(),
           until: "on",
         };
+      } else if (camera.status === "off") {
+        return {
+          countdownTime: new Date(data?.nextExecution).getTime(),
+          until: "on",
+        };
       } else {
         return {
           countdownTime:
-            new Date(data?.nextExecution).getTime() -
-            camera.automation.minutesOff * 60 * 1000,
+            new Date().getTime() +
+            (secondsUntilNextExecution - camera.automation.minutesOff * 60) *
+              1000,
           until: "off",
         };
       }
     },
-    // enabled: camera.mode === "auto",
-    refetchInterval: 10000,
+    enabled: camera.mode === "auto",
+    refetchInterval: 1000,
   });
 
   if (camera.mode !== "auto" || !camera.automation) {

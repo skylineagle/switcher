@@ -90,21 +90,22 @@ export function CamerasPage() {
   if (isCamerasLoading) return <div>Loading...</div>;
 
   return (
-    <Card className="size-full">
+    <Card className="size-full shadow-2xl rounded-t-md rounded-b-none border-none">
       <CardHeader>
-        <CardTitle>Cameras</CardTitle>
+        <CardTitle>Devices</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 bg-background">
             <TableRow>
-              <TableHead className="w-[30%]">Name</TableHead>
+              <TableHead className="w-[20%]">Name</TableHead>
               <TableHead className="w-[25%]">Mode</TableHead>
               <TableHead className="w-[20%]">Status</TableHead>
-              <TableHead className="w-[20%]">Automation</TableHead>
-              <TableHead className="w-[25%]">Actions</TableHead>
+              <TableHead className="w-[20%]" />
+              <TableHead className="w-[35%]">Actions</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {cameras?.map((camera) => {
               return (

@@ -15,7 +15,7 @@ interface LiveIndicatorProps {
   status: Omit<Camera["status"], "off">;
 }
 
-const LiveIndicator: React.FC<LiveIndicatorProps> = ({
+export const LiveIndicator: React.FC<LiveIndicatorProps> = ({
   size = "medium",
   status,
 }) => {
@@ -24,7 +24,9 @@ const LiveIndicator: React.FC<LiveIndicatorProps> = ({
       variant="default"
       className={cn(
         "space-x-2",
-        status === "on" ? "bg-red-500" : "bg-yellow-500"
+        status === "on"
+          ? "bg-red-500 hover:bg-red-500"
+          : "bg-yellow-500 hover:bg-yellow-500"
       )}
     >
       <div className={`relative ${sizeClasses[size]}`}>
@@ -35,11 +37,7 @@ const LiveIndicator: React.FC<LiveIndicatorProps> = ({
           className={`relative ${sizeClasses[size]} bg-current rounded-full`}
         ></div>
       </div>
-      <Label className="text-sm">
-        {status === "on" ? "Live" : "Waiting for stream"}
-      </Label>
+      <Label className="text-sm">{status === "on" ? "Live" : "Waiting"}</Label>
     </Badge>
   );
 };
-
-export default LiveIndicator;

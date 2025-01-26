@@ -1,4 +1,4 @@
-import { CamerasPage } from "@/components/pages/cameras-page";
+import { CamerasPage } from "@/components/pages/cameras";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

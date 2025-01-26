@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
+import { LiveIndicator } from "@/components/ui/live-indicator";
 import { Camera } from "@/types/types";
-import LiveIndicator from "./ui/live-indicator";
 
 interface StatusIndicatorProps {
   status: Camera["status"];
