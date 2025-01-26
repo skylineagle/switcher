@@ -19,7 +19,7 @@ services:
       - app-network
 
   mediamtx:
-    image: bluenviron/mediamtx:latest
+    image: bluenviron/mediamtx:1.11.2
     container_name: mediamtx
     restart: unless-stopped
     ports:
@@ -34,7 +34,7 @@ services:
       - app-network
 
   mediamtx-2:
-    image: bluenviron/mediamtx:latest
+    image: bluenviron/mediamtx:1.11.2
     container_name: mediamtx-2
     restart: unless-stopped
     ports:

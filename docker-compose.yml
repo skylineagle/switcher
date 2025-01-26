@@ -21,7 +21,7 @@ services:
       - app-network
 
   mediamtx:
-    image: bluenviron/mediamtx:latest
+    image: bluenviron/mediamtx:v1.11.2
     restart: unless-stopped
     ports:
       - "9997:9997" # API

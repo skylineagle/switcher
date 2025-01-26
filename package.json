@@ -12,6 +12,7 @@
     "baker": "bun run --watch src/services/baker/index.ts"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-alert-dialog": "^1.1.5",
     "@radix-ui/react-avatar": "^1.1.2",

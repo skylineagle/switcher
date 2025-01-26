@@ -1,5 +1,6 @@
 import { CameraAutomation } from "@/types/types";
 import { Elysia } from "elysia";
+import cors from "@elysiajs/cors";
 import {
   createJob,
   deleteJob,
@@ -31,7 +32,6 @@ app.post("/jobs/:camera", async ({ params, body }) => {
     const automation = parsedBody as CameraAutomation;
 
     logger.info("Creating new job");
-    logger.info(automation);
     await createJob(camera, automation);
 
     return { success: true };
@@ -106,7 +106,7 @@ app.get("/jobs/:camera/next", async ({ params }) => {
   };
 });
 
-app.listen(3001);
+app.use(cors()).listen(3000);
 logger.info("🦊 Baker API server running at http://localhost:3000");
 logger.debug(`Pocketbase URL: ${process.env.POCKETBASE_URL}`);
 logger.debug(`Stream URL: ${process.env.MEDIAMTX_API}`);
