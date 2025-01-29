@@ -90,7 +90,7 @@ export function CamerasPage() {
   if (isCamerasLoading) return <div>Loading...</div>;
 
   return (
-    <Card className="size-full shadow-2xl rounded-t-md rounded-b-none border-none">
+    <Card className="size-full shadow-2xl border-none">
       <CardHeader>
         <CardTitle>Devices</CardTitle>
       </CardHeader>
