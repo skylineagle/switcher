@@ -1,5 +1,7 @@
 /// <reference path="../pb_data/types.d.ts" />
 
+const MEDIAMTX_API = $os.getenv("MEDIAMTX_API") || "http://mediamtx:9997";
+
 function updateStatus() {
   $app.logger().info("Updating status");
   try {
@@ -12,7 +14,7 @@ function updateStatus() {
     // Fetch live cameras from MediaMTX
     const response = $http.send({
       method: "GET",
-      url: "http://mediamtx:9997/v3/paths/list",
+      url: `${MEDIAMTX_API}/v3/paths/list`,
     });
 
     if (response.statusCode !== 200) {
