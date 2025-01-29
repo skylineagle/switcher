@@ -9,7 +9,7 @@ function createCameraJob(cameraId, automation) {
       "Content-Type": "application/json",
     },
     url: `${BAKER_URL}/jobs/${cameraId}`,
-    body: JSON.stringify(automation),
+    body: automation,
   });
 }
 
