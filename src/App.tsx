@@ -1,6 +1,5 @@
 import { CamerasPage } from "@/components/pages/cameras";
 import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginForm } from "./components/auth/login-form";
@@ -19,37 +18,35 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <Routes>
-              <Route
-                path="/login"
-                element={
-                  isAuthenticated ? (
-                    <Navigate to="/" replace />
-                  ) : (
-                    <AppLayout>
-                      <LoginForm />
-                    </AppLayout>
-                  )
-                }
-              />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <CamerasPage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-            <Toaster position="top-center" />
-          </BrowserRouter>
-        </QueryClientProvider>
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <AppLayout>
+                    <LoginForm />
+                  </AppLayout>
+                )
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <CamerasPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+          <Toaster position="top-center" />
+        </BrowserRouter>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

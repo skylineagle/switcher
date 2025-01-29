@@ -16,24 +16,31 @@ export interface CameraNameProps {
 export function CameraName({ camera }: CameraNameProps) {
   return (
     <div className="flex items-center gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Badge variant="default">
-            <Label>{camera.name}</Label>
-          </Badge>
-        </TooltipTrigger>
-        <TooltipContent
-          side="right"
-          sideOffset={30}
-          className="flex items-center gap-2"
-        >
-          <span>ID: {camera.id}</span>
-          <CopyButton
-            value={camera.id}
-            className="text-foreground hover:bg-muted hover:text-foreground"
-          />
-        </TooltipContent>
-      </Tooltip>
+      {camera.nickname ? (
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge variant="default">
+              <Label>{camera.nickname}</Label>
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent
+            side="right"
+            sideOffset={30}
+            className="flex items-center gap-2"
+          >
+            <span>{camera.name}</span>
+            <CopyButton
+              value={camera.id}
+              className="text-foreground hover:bg-muted hover:text-foreground"
+            />
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <Badge variant="default">
+          <Label>{camera.name}</Label>
+        </Badge>
+      )}
+
       <StreamLink camera={camera} />
     </div>
   );

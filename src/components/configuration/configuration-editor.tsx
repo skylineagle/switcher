@@ -23,7 +23,7 @@ import Editor, { type OnMount } from "@monaco-editor/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import type * as Monaco from "monaco-editor";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export interface ConfigurationEditorProps {
@@ -38,11 +38,10 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
     id: string;
     config: string;
     automation: CameraAutomation | null;
+    nickname: string;
   } | null>(null);
   const [isJsonValid, setIsJsonValid] = useState(true);
-  const [currentTab, setCurrentTab] = useState<"automation" | "config">(
-    "automation"
-  );
+  const [currentTab, setCurrentTab] = useState<"general" | "config">("general");
   const monacoRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const { mutate: updateCameraMutation } = useMutation({
@@ -109,6 +108,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
           id: editingConfig.id,
           configuration: parsedConfig,
           automation: editingConfig.automation,
+          nickname: editingConfig.nickname,
         });
       } catch {
         toast.error("Invalid JSON configuration");
@@ -122,21 +122,10 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
         id: editingConfig.id,
         configuration: JSON.parse(editingConfig.config),
         automation: editingConfig.automation,
+        nickname: editingConfig.nickname,
       });
     }
   }, [editingConfig, currentTab, updateCameraMutation, isAutomationValid]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        e.preventDefault();
-        if (!isSaveDisabled()) handleSave();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [editingConfig, currentTab, isSaveDisabled, handleSave]);
 
   return (
     <Dialog
@@ -148,6 +137,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
             id: camera.id,
             config: JSON.stringify(camera.configuration, null, 2),
             automation: camera.automation,
+            nickname: camera.nickname ?? "",
           });
       }}
     >
@@ -168,9 +158,9 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
           </DialogDescription>
         </DialogHeader>
         <Tabs
-          defaultValue="automation"
+          defaultValue="general"
           onValueChange={(value) =>
-            setCurrentTab(value as "automation" | "config")
+            setCurrentTab(value as "general" | "config")
           }
         >
           <TabsList
@@ -179,8 +169,8 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
               user?.level !== "user" && "grid grid-cols-2"
             )}
           >
-            <TabsTrigger className="w-full" value="automation">
-              <Label className="text-foreground">Automation</Label>
+            <TabsTrigger className="w-full" value="general">
+              <Label className="text-foreground">General</Label>
             </TabsTrigger>
             {user?.level !== "user" && (
               <TabsTrigger className="w-full" value="config">
@@ -214,8 +204,27 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
               }}
             />
           </TabsContent>
-          <TabsContent value="automation" className="py-4">
+          <TabsContent value="general" className="py-4">
             <div className="grid gap-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="nickname"
+                  className="text-right text-sm font-medium"
+                >
+                  Nickname
+                </Label>
+                <Input
+                  id="nickname"
+                  type="text"
+                  className="col-span-3"
+                  value={editingConfig?.nickname ?? ""}
+                  onChange={(e) =>
+                    setEditingConfig((prev) =>
+                      prev ? { ...prev, nickname: e.target.value } : null
+                    )
+                  }
+                />
+              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label
                   htmlFor="minutesOn"
