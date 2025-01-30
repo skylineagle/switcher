@@ -1,8 +1,9 @@
 import { AutomationIndicator } from "@/components/automation-indicator";
+import { CameraName } from "@/components/camera-name";
 import { ConfigurationEditor } from "@/components/configuration/configuration-editor";
 import { DeleteCamera } from "@/components/delete-camera/delete-camera";
 import { StatusIndicator } from "@/components/status-indicator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -10,14 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { pb } from "@/lib/pocketbase";
 import { useAuthStore } from "@/services/auth";
 import { getCameras, updateCamera } from "@/services/cameras";
@@ -26,7 +20,6 @@ import { UpdateCamera } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { CameraName } from "../camera-name";
 
 export function CamerasPage() {
   const { user } = useAuthStore();
@@ -91,29 +84,17 @@ export function CamerasPage() {
 
   return (
     <Card className="size-full shadow-2xl border-none">
-      <CardHeader>
-        <CardTitle>Devices</CardTitle>
-      </CardHeader>
+      <CardHeader></CardHeader>
       <CardContent>
         <Table>
-          <TableHeader className="sticky top-0 bg-background">
-            <TableRow>
-              <TableHead className="w-[20%]">Name</TableHead>
-              <TableHead className="w-[25%]">Mode</TableHead>
-              <TableHead className="w-[20%]">Status</TableHead>
-              <TableHead className="w-[20%]" />
-              <TableHead className="w-[35%]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-
           <TableBody>
             {cameras?.map((camera) => {
               return (
                 <TableRow key={camera.id}>
-                  <TableCell>
+                  <TableCell className="w-[20%]">
                     <CameraName camera={camera} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[25%]">
                     <Select
                       value={camera.mode}
                       onValueChange={(value: CamerasModeOptions) => {
@@ -139,13 +120,13 @@ export function CamerasPage() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[20%]">
                     <StatusIndicator status={camera.status} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[20%]">
                     <AutomationIndicator camera={camera} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[35%]">
                     <div className="flex gap-2">
                       <ConfigurationEditor camera={camera} />
                       {user?.level === "manager" ||

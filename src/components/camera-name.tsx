@@ -1,4 +1,3 @@
-import { CopyButton } from "@/components/ui/copy-button";
 import {
   Tooltip,
   TooltipContent,
@@ -23,16 +22,8 @@ export function CameraName({ camera }: CameraNameProps) {
               <Label>{camera.nickname}</Label>
             </Badge>
           </TooltipTrigger>
-          <TooltipContent
-            side="right"
-            sideOffset={30}
-            className="flex items-center gap-2"
-          >
-            <span>{camera.name}</span>
-            <CopyButton
-              value={camera.id}
-              className="text-foreground hover:bg-muted hover:text-foreground"
-            />
+          <TooltipContent side="right" sideOffset={30}>
+            {camera.name}
           </TooltipContent>
         </Tooltip>
       ) : (

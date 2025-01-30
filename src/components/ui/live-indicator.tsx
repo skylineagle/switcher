@@ -25,7 +25,7 @@ export const LiveIndicator: React.FC<LiveIndicatorProps> = ({
       className={cn(
         "space-x-2 items-center",
         status === "on"
-          ? "bg-destructive hover:bg-destructive"
+          ? "bg-emerald-500 hover:bg-emerald-500"
           : "bg-yellow-500 hover:bg-yellow-500"
       )}
     >
