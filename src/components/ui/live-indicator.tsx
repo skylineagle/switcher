@@ -25,7 +25,7 @@ export const LiveIndicator: React.FC<LiveIndicatorProps> = ({
       className={cn(
         "space-x-2 items-center",
         status === "on"
-          ? "bg-red-500 hover:bg-red-500"
+          ? "bg-destructive hover:bg-destructive"
           : "bg-yellow-500 hover:bg-yellow-500"
       )}
     >
@@ -61,6 +61,7 @@ export const LiveIndicator: React.FC<LiveIndicatorProps> = ({
           </div>
         )}
       </div>
+
       <Label className="text-sm">{status === "on" ? "Live" : "Waiting"}</Label>
     </Badge>
   );
