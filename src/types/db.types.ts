@@ -89,8 +89,8 @@ export type SuperusersRecord = {
 
 export enum CamerasModeOptions {
 	"live" = "live",
-	"offline" = "offline",
 	"auto" = "auto",
+	"offline" = "offline",
 }
 
 export enum CamerasStatusOptions {
