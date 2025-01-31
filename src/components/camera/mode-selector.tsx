@@ -7,10 +7,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { CamerasModeOptions } from "@/types/db.types";
+import { useAuthStore } from "@/services/auth";
+import { getIsPermitted } from "@/services/permissions";
+import {
+  CamerasModeOptions,
+  PermissionsAllowedOptions,
+} from "@/types/db.types";
+import { useQuery } from "@tanstack/react-query";
 import { Clock, Eye, EyeOff } from "lucide-react";
-import { memo } from "react";
 import { motion } from "motion/react";
+import { memo } from "react";
 
 export interface ModeSelectorProps {
   mode: CamerasModeOptions;
@@ -49,12 +55,21 @@ const modeConfig = {
 export const ModeSelector = memo(
   ({ mode, automation, handleModeChange, isLoading }: ModeSelectorProps) => {
     const currentMode = modeConfig[mode];
+    const { user } = useAuthStore();
+    const { data: isPermitted } = useQuery({
+      queryKey: ["permissions", "mode_change", user?.id],
+      queryFn: async () =>
+        await getIsPermitted(
+          "mode_change",
+          (user?.level ?? "user") as PermissionsAllowedOptions
+        ),
+    });
 
     return (
       <Select
         value={mode}
         onValueChange={handleModeChange}
-        disabled={isLoading}
+        disabled={isLoading || !isPermitted}
       >
         <SelectTrigger
           className={cn(

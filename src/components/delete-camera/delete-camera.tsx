@@ -11,14 +11,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuthStore } from "@/services/auth";
 import { deleteCamera } from "@/services/cameras";
+import { getIsPermitted } from "@/services/permissions";
+import { PermissionsAllowedOptions } from "@/types/db.types";
 import { CamerasResponse } from "@/types/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function DeleteCamera({ camera }: { camera: CamerasResponse }) {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  const { data: isPermitted } = useQuery({
+    queryKey: ["permissions", "camera_delete", user?.id],
+    queryFn: async () =>
+      await getIsPermitted(
+        "camera_delete",
+        (user?.level ?? "user") as PermissionsAllowedOptions
+      ),
+  });
   const { mutate: deleteCameraMutation } = useMutation({
     mutationFn: async (id: string) => {
       await deleteCamera(id);
@@ -34,7 +44,7 @@ export function DeleteCamera({ camera }: { camera: CamerasResponse }) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger disabled={user?.level === "user"}>
+      <AlertDialogTrigger disabled={isPermitted}>
         <Trash2 className="h-4 w-4 text-destructive" />
       </AlertDialogTrigger>
       <AlertDialogContent>

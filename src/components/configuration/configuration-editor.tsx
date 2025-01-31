@@ -17,10 +17,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/services/auth";
 import { updateCamera } from "@/services/cameras";
-import { CamerasModeOptions } from "@/types/db.types";
+import { getIsPermitted } from "@/services/permissions";
+import {
+  CamerasModeOptions,
+  PermissionsAllowedOptions,
+} from "@/types/db.types";
 import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import type * as Monaco from "monaco-editor";
 import { useCallback, useRef, useState } from "react";
@@ -43,7 +47,22 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
   const [isJsonValid, setIsJsonValid] = useState(true);
   const [currentTab, setCurrentTab] = useState<"general" | "config">("general");
   const monacoRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
-
+  const { data: isConfigurationEditPermitted } = useQuery({
+    queryKey: ["permissions", "configuration_edit", user?.id],
+    queryFn: async () =>
+      await getIsPermitted(
+        "configuration_edit",
+        (user?.level ?? "user") as PermissionsAllowedOptions
+      ),
+  });
+  const { data: isCameraEditPermitted } = useQuery({
+    queryKey: ["permissions", "camera_edit", user?.id],
+    queryFn: async () =>
+      await getIsPermitted(
+        "camera_edit",
+        (user?.level ?? "user") as PermissionsAllowedOptions
+      ),
+  });
   const { mutate: updateCameraMutation } = useMutation({
     mutationFn: async (data: UpdateCamera) => {
       if (
@@ -145,7 +164,9 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
         <Button
           variant="ghost"
           size="icon"
-          disabled={camera.mode !== CamerasModeOptions.offline}
+          disabled={
+            camera.mode !== CamerasModeOptions.offline || !isCameraEditPermitted
+          }
         >
           <Pencil className="h-4 w-4" />
         </Button>
@@ -166,13 +187,13 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
           <TabsList
             className={cn(
               "w-full",
-              user?.level !== "user" && "grid grid-cols-2"
+              isConfigurationEditPermitted && "grid grid-cols-2"
             )}
           >
             <TabsTrigger className="w-full" value="general">
               <Label className="text-foreground">General</Label>
             </TabsTrigger>
-            {user?.level !== "user" && (
+            {isConfigurationEditPermitted && (
               <TabsTrigger className="w-full" value="config">
                 <Label className="text-foreground">Configuration</Label>
               </TabsTrigger>

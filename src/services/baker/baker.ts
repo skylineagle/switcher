@@ -137,23 +137,29 @@ export async function getNextExecution(camera: string): Promise<Date> {
 }
 
 async function updateStatus() {
-  const cameras = await pb.collection("cameras").getFullList<CamerasResponse>();
-  const pathList = await getMediaMTXPaths();
-  const paths = pathList.items;
+  try {
+    const cameras = await pb
+      .collection("cameras")
+      .getFullList<CamerasResponse>();
+    const pathList = await getMediaMTXPaths();
+    const paths = pathList.items;
 
-  for (const camera of cameras) {
-    const status = paths.includes(camera.configuration?.name);
+    for (const camera of cameras) {
+      const status = paths.includes(camera.configuration?.name);
 
-    await pb.collection("cameras").update(camera.id, {
-      status: status
-        ? paths.find(
-            (path: { name: string; ready: boolean }) =>
-              path.name === camera.configuration?.name
-          ).ready
-          ? "on"
-          : "waiting"
-        : "off",
-    });
+      await pb.collection("cameras").update(camera.id, {
+        status: status
+          ? paths.find(
+              (path: { name: string; ready: boolean }) =>
+                path.name === camera.configuration?.name
+            ).ready
+            ? "on"
+            : "waiting"
+          : "off",
+      });
+    }
+  } catch (error) {
+    logger.error(error);
   }
 }
 
