@@ -28,7 +28,7 @@ async function initializeJobs() {
         } else if (camera.mode === "live") {
           if (camera.configuration) {
             logger.info(`Starting job for camera ${camera.id} on live mode`);
-            await addMediaMTXPath(camera.name, camera.configuration);
+            await addMediaMTXPath(camera.configuration);
           }
         }
       }
@@ -64,15 +64,15 @@ export async function createJob(
           throw new Error("Camera configuration is null");
         }
 
-        await addMediaMTXPath(data.name, data.configuration);
+        await addMediaMTXPath(data.configuration);
         updateStatus();
         logger.info(`Camera ${camera} turned on`);
 
         // Keep camera on for specified duration
         setTimeout(async () => {
-          if (baker.isRunning(camera)) {
+          if (baker.isRunning(camera) && data.configuration?.name) {
             // Turn camera off after duration
-            await removeMediaMTXPath(data.name);
+            await removeMediaMTXPath(data.configuration.name);
             updateStatus();
             logger.info(`Camera ${camera} turned off`);
           } else {
@@ -137,18 +137,18 @@ export async function getNextExecution(camera: string): Promise<Date> {
 }
 
 async function updateStatus() {
-  const cameras = await pb.collection("cameras").getFullList();
+  const cameras = await pb.collection("cameras").getFullList<CamerasResponse>();
   const pathList = await getMediaMTXPaths();
   const paths = pathList.items;
 
   for (const camera of cameras) {
-    const status = paths.includes(camera.name);
+    const status = paths.includes(camera.configuration?.name);
 
     await pb.collection("cameras").update(camera.id, {
       status: status
         ? paths.find(
             (path: { name: string; ready: boolean }) =>
-              path.name === camera.name
+              path.name === camera.configuration?.name
           ).ready
           ? "on"
           : "waiting"

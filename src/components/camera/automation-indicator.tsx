@@ -8,6 +8,7 @@ import { CamerasResponse } from "@/types/db.types";
 import { CameraAutomation } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
+import { motion } from "motion/react";
 import Countdown from "react-countdown";
 
 type CountdownData = {
@@ -68,18 +69,27 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
     return null;
   }
 
-  console.log(data);
   return (
     data?.countdownTime && (
-      <div className="text-sm text-muted-foreground">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-sm text-muted-foreground"
+      >
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Clock className="h-3 w-3" />
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Clock className="h-3 w-3" />
+              </motion.div>
             </TooltipTrigger>
             <TooltipContent
               className="flex flex-col gap-1 items-start border-none"
-              side="left"
+              side="top"
               sideOffset={10}
             >
               <Label className="text-xs">
@@ -105,7 +115,7 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
             key={`${data?.countdownTime}-${camera.id}`}
           />
         </div>
-      </div>
+      </motion.div>
     )
   );
 }

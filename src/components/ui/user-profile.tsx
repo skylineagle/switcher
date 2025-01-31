@@ -16,8 +16,8 @@ export function UserProfile() {
 
   if (!isAuthenticated || !user) return null;
 
-  const initials = user.name
-    ? user.name
+  const initials = user.username
+    ? user.username
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -33,7 +33,7 @@ export function UserProfile() {
               src={`${import.meta.env.VITE_POCKETBASE_URL}/api/files/${
                 user.collectionId
               }/${user.id}/${user.avatar}`}
-              alt={user.name || user.email}
+              alt={user.username || user.email}
             />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
@@ -42,8 +42,10 @@ export function UserProfile() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            {user.name && (
-              <p className="text-sm font-medium leading-none">{user.name}</p>
+            {user.username && (
+              <p className="text-sm font-medium leading-none">
+                {user.username}
+              </p>
             )}
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}

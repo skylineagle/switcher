@@ -121,7 +121,6 @@ export type UsersRecord = {
 	emailVisibility?: boolean
 	id: string
 	level?: UsersLevelOptions
-	name?: string
 	password: string
 	tokenKey: string
 	updated?: IsoDateString

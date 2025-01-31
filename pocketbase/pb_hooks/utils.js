@@ -27,7 +27,8 @@ function updateStatus() {
     // Update each camera's status based on whether it's live
     // Update status for each live camera
     for (const camera of cameras) {
-      const cameraName = camera.get("name");
+      const configuration = JSON.parse(camera.get("configuration"));
+      const cameraName = configuration.name;
       const cameraStatus = liveCameras
         .map((path) => path.name)
         .includes(cameraName);

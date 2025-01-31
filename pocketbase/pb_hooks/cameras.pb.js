@@ -22,59 +22,90 @@ onRecordAfterCreateSuccess((e) => {
   e.next();
 }, "cameras");
 
-// Handle after successful update
-onRecordUpdateRequest((e) => {
-  const {
-    createCameraJob,
-    startCameraJob,
-    stopCameraJob,
-    getJobStatus,
-  } = require(`${__hooks}/job.utils`);
-  const {
-    addMediaMTXPath,
-    deleteMediaMTXPath,
-    updateMediaMTXPath,
-  } = require(`${__hooks}/mediamtx.utils`);
-  const { updateStatus } = require(`${__hooks}/utils`);
+// Make sure there is no duplicate configuration
+// onRecordValidate((e) => {
+//   const configuration = JSON.parse(e.record.get("configuration"));
+//   const cameras = $app.findAllRecords("cameras");
+//   const duplicate = cameras.find(
+//     (camera) => camera.configuration === configuration
+//   );
+//   if (duplicate) {
+//     e.error("Duplicate configuration");
+//   }
+//   e.next();
+// }, "cameras");
 
-  $app.logger().debug(`Camera updated request with ID: ${e.record.id}`);
+// Handle after successful update
+// onRecordUpdateRequest((e) => {
+//   const {
+//     createCameraJob,
+//     startCameraJob,
+//     stopCameraJob,
+//   } = require(`${__hooks}/job.utils`);
+//   const {
+//     addMediaMTXPath,
+//     deleteMediaMTXPath,
+//     updateMediaMTXPath,
+//   } = require(`${__hooks}/mediamtx.utils`);
+//   const { updateStatus } = require(`${__hooks}/utils`);
+
+//   $app.logger().debug(`Camera updated request with ID: ${e.record.id}`);
+// const current = $app.findRecordById("cameras", e.record.id);
+// const mode = e.record.get("mode");
+// const automation = e.record.get("automation");
+
+// On Automation Settings Change
+// if (
+//   automation &&
+//   JSON.stringify(automation) !== JSON.stringify(current.get("automation"))
+// ) {
+//   $app.logger().info("Automation settings changed, syncing baker job");
+//   try {
+//     createCameraJob(e.record.id, automation);
+//   } catch (error) {
+//     $app.logger().error("Failed to sync baker job", error);
+//   }
+// }
+
+// On Mode Change
+// if (mode && mode !== current.get("mode")) {
+//   $app.logger().info("Mode changed, syncing camera state");
+//   const currentConfiguration = JSON.parse(current.get("configuration"));
+//   const configuration = JSON.parse(e.record.get("configuration"));
+//   try {
+//     // If mode changed to auto, create and start job
+//     if (mode === "auto") {
+//       deleteMediaMTXPath(currentConfiguration.name);
+//       startCameraJob(e.record.id);
+//     } else if (mode === "live") {
+//       $app.logger().info("Stopping job");
+//       stopCameraJob(e.record.id);
+
+//       $app.logger().info("Adding camera to MediaMTX");
+//       addMediaMTXPath(configuration);
+//     }
+//     // If mode changed to off or live, stop and delete job
+//     else {
+//       $app.logger().info("Stopping job");
+//       stopCameraJob(e.record.id);
+
+//       deleteMediaMTXPath(currentConfiguration.name);
+//     }
+//   } catch (error) {
+//     $app.logger().error(error);
+//   }
+// }
+
+//   e.next();
+//   updateStatus();
+// }, "cameras");
+
+// Handle automation change
+onRecordUpdateRequest((e) => {
+  const { createCameraJob } = require(`${__hooks}/job.utils`);
   const current = $app.findRecordById("cameras", e.record.id);
-  const name = e.record.get("name");
-  const mode = e.record.get("mode");
   const automation = e.record.get("automation");
 
-  // Sync name into configuration.name
-  if (name && name !== current.get("name")) {
-    $app.logger().info("Name changed, syncing with configuration");
-    try {
-      const configuration = JSON.parse(e.record.get("configuration"));
-      configuration.name = name;
-      e.record.set("configuration", JSON.stringify(configuration));
-    } catch (error) {
-      $app.logger().error("Failed to sync name with configuration", error);
-      throw new Error("Failed to sync name with configuration");
-    }
-  }
-
-  // Sync configuration.name with name
-  try {
-    const configuration = JSON.parse(e.record.get("configuration"));
-    const currentConfiguration = JSON.parse(current.get("configuration"));
-
-    if (configuration.name !== currentConfiguration.name) {
-      $app
-        .logger()
-        .info("Configuration name changed, syncing with camera name");
-      e.record.set("name", configuration.name);
-    }
-  } catch (error) {
-    $app
-      .logger()
-      .error("Failed to sync configuration name with camera name", error);
-    throw new Error("Failed to sync configuration name with camera name");
-  }
-
-  // On Automation Settings Change
   if (
     automation &&
     JSON.stringify(automation) !== JSON.stringify(current.get("automation"))
@@ -86,29 +117,42 @@ onRecordUpdateRequest((e) => {
       $app.logger().error("Failed to sync baker job", error);
     }
   }
+  e.next();
+}, "cameras");
 
-  // On Mode Change
+// Handle mode change
+onRecordUpdateRequest((e) => {
+  const { updateStatus } = require(`${__hooks}/utils`);
+  const { startCameraJob, stopCameraJob } = require(`${__hooks}/job.utils`);
+  const {
+    addMediaMTXPath,
+    deleteMediaMTXPath,
+  } = require(`${__hooks}/mediamtx.utils`);
+  const current = $app.findRecordById("cameras", e.record.id);
+  const mode = e.record.get("mode");
+
   if (mode && mode !== current.get("mode")) {
     $app.logger().info("Mode changed, syncing camera state");
+    const currentConfiguration = JSON.parse(current.get("configuration"));
+    const configuration = JSON.parse(e.record.get("configuration"));
     try {
       // If mode changed to auto, create and start job
       if (mode === "auto") {
-        deleteMediaMTXPath(name);
+        deleteMediaMTXPath(currentConfiguration.name);
         startCameraJob(e.record.id);
       } else if (mode === "live") {
         $app.logger().info("Stopping job");
         stopCameraJob(e.record.id);
 
         $app.logger().info("Adding camera to MediaMTX");
-        const configuration = JSON.parse(e.record.get("configuration"));
-        addMediaMTXPath(name, configuration);
+        addMediaMTXPath(configuration);
       }
       // If mode changed to off or live, stop and delete job
       else {
         $app.logger().info("Stopping job");
         stopCameraJob(e.record.id);
 
-        deleteMediaMTXPath(name);
+        deleteMediaMTXPath(currentConfiguration.name);
       }
     } catch (error) {
       $app.logger().error(error);
@@ -130,7 +174,7 @@ onRecordAfterDeleteSuccess((e) => {
     // Stop and delete any existing job
     stopCameraJob(e.record.id);
     deleteCameraJob(e.record.id);
-    deleteMediaMTXPath(e.record.get("name"));
+    deleteMediaMTXPath(e.record.get("configuration").name);
   } catch (error) {
     $app.logger().error(error);
   }

@@ -4,20 +4,20 @@ import { MEDIAMTX_API } from "@/services/baker/config";
 
 export const API_URL = `${MEDIAMTX_API}/v3`;
 
-export async function addMediaMTXPath(
-  name: string,
-  configuration: CameraConfiguration
-) {
+export async function addMediaMTXPath(configuration: CameraConfiguration) {
   logger.info(
-    `Adding MediaMTX path for camera ${name} with source ${configuration.source}`
+    `Adding MediaMTX path for camera ${configuration.name} with source ${configuration.source}`
   );
-  const response = await fetch(`${API_URL}/config/paths/add/${name}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(configuration),
-  });
+  const response = await fetch(
+    `${API_URL}/config/paths/add/${configuration.name}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(configuration),
+    }
+  );
 
   if (!response.ok) {
     logger.error(`Failed to add MediaMTX path: ${response.statusText}`);

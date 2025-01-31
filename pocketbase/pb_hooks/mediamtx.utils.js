@@ -2,23 +2,23 @@
 
 const MEDIAMTX_API = $os.getenv("MEDIAMTX_API") || "http://mediamtx:9997";
 
-function addMediaMTXPath(name, configuration) {
+function addMediaMTXPath(configuration) {
   $app.logger().info("Adding mediamtx path");
   $http.send({
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    url: `${MEDIAMTX_API}/v3/config/paths/add/${name}`,
-    body: JSON.stringify({ name, ...configuration }),
+    url: `${MEDIAMTX_API}/v3/config/paths/add/${configuration.name}`,
+    body: JSON.stringify(configuration),
   });
 }
 
-function updateMediaMTXPath(oldName, configuration) {
+function updateMediaMTXPath(configuration) {
   $app.logger().info("Updating mediamtx path");
   const response = $http.send({
     method: "PATCH",
-    url: `${MEDIAMTX_API}/v3/config/paths/patch/${name}`,
+    url: `${MEDIAMTX_API}/v3/config/paths/patch/${configuration.name}`,
     body: JSON.stringify(configuration),
   });
 

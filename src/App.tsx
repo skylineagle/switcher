@@ -1,5 +1,4 @@
-import { CamerasPage } from "@/components/pages/cameras";
-import { Toaster } from "@/components/ui/sonner";
+import { CamerasPage } from "@/components/cameras";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginForm } from "./components/auth/login-form";
@@ -44,7 +43,6 @@ function App() {
               }
             />
           </Routes>
-          <Toaster position="top-center" />
         </BrowserRouter>
       </QueryClientProvider>
     </ThemeProvider>
