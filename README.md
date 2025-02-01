@@ -1,50 +1,64 @@
-# React + TypeScript + Vite
+# Switcher
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Switcher is a modern web application built with React, TypeScript, and Vite. It provides a lightweight, high-performance user experience using best practices from Next.js App Router, Shadcn UI, Radix UI, and Tailwind CSS. The project follows functional programming principles, modularizes code effectively, and employs rigorous error handling and validation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Fast and Responsive:** Leveraging Vite for fast refresh and HMR.
+- **Type-Safe Development:** Written entirely in TypeScript with strict type-checking.
+- **Modern UI Components:** Uses Shadcn UI, Radix UI, and Tailwind CSS for a responsive design.
+- **Modular Architecture:** Functional components and a modular file structure for easy maintenance.
+- **Robust Error Handling:** Guards and early returns to ensure a resilient codebase.
 
-## Expanding the ESLint configuration
+## File Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Switcher follows a clear and modular layout:
 
-- Configure the top-level `parserOptions` property like this:
+- `src/components/` – Contains React components, organized in subdirectories by feature.
+- `src/services/` – Business logic and API service functions.
+- `src/types/` – All TypeScript interfaces and types.
+- `src/consts.ts` – Static data and configuration values.
+- `README.md` – This file.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Setup Instructions
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+1. **Install Dependencies**
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+   Run the following command using bun:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+   ```
+   bun install
+   ```
+
+2. **Development Server**
+
+   To run the development server with hot module replacement (HMR):
+
+   ```
+   bun dev
+   ```
+
+3. **Building for Production**
+
+   To create an optimized production build:
+
+   ```
+   bun build
+   ```
+
+## Usage
+
+Switcher provides a fluid and interactive interface. Navigate through various modes and configurations seamlessly. The application handles both light and dark themes with a built-in theme provider and adaptive camera mode selectors for enhanced user experience.
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+- Ensure new code is fully functional and passes linting.
+- Follow the modular and functional programming practices outlined above.
+- Write tests for any new features or major changes.
+- Use descriptive variable names and include appropriate comments to document edge cases.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
