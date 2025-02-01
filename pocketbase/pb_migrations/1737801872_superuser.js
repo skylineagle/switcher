@@ -7,7 +7,7 @@ migrate((app) => {
 
   // note: the values can be eventually loaded via $os.getenv(key)
   // or from a special local config file
-  record.set("email", "admin@switchr.io");
+  record.set("email", "admin@switcher.io");
   record.set("password", "Aa123456");
 
   app.save(record);

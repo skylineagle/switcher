@@ -3,7 +3,7 @@ migrate((app) => {
   let users = app.findCollectionByNameOrId("users");
   let userRecord = new Record(users);
 
-  userRecord.set("email", "user@switchr.io");
+  userRecord.set("email", "user@switcher.io");
   userRecord.set("password", "Aa123456");
   userRecord.set("verified", true);
   userRecord.set("name", "User");
