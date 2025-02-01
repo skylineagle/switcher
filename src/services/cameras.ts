@@ -2,11 +2,53 @@ import { pb } from "@/lib/pocketbase";
 import { CamerasModeOptions } from "@/types/db.types";
 import { CamerasResponse, UpdateCamera } from "@/types/types";
 
-export async function getCameras() {
+export async function getCamerasIds() {
   const records = await pb.collection("cameras").getFullList<CamerasResponse>({
+    fields: "id",
+  });
+  return records?.map((record) => record.id);
+}
+
+export interface GetCamerasOptions {
+  modes?: CamerasModeOptions[];
+  search?: string;
+}
+
+export async function getCameras({
+  modes = [],
+  search,
+}: GetCamerasOptions = {}) {
+  const filters = [];
+
+  if (modes.length > 0) {
+    // PocketBase doesn't support direct 'in' operator, so we use OR conditions
+    const modeFilters = modes.map((mode) => `mode = "${mode}"`);
+    filters.push(`(${modeFilters.join(" || ")})`);
+  }
+
+  if (search?.trim()) {
+    filters.push(
+      `(nickname ~ "${search.trim()}" || configuration.name ~ "${search.trim()}")`
+    );
+  }
+
+  const filterStr = filters.length > 0 ? filters.join(" && ") : "";
+
+  const records = await pb
+    .collection("cameras")
+    .getList<CamerasResponse>(1, 50, {
+      fields: "id,nickname,configuration,automation,mode,status",
+      filter: filterStr || undefined,
+    });
+
+  return records.items;
+}
+
+export async function getCamera(id: string) {
+  const record = await pb.collection("cameras").getOne<CamerasResponse>(id, {
     fields: "id,nickname,configuration,automation,mode,status",
   });
-  return records;
+  return record;
 }
 
 export async function updateCamera({ id, ...data }: UpdateCamera) {
@@ -36,6 +78,7 @@ export async function batchUpdateCameras({
   for (let i = 0; i < ids.length; i++) {
     try {
       await pb.collection("cameras").update(ids[i], { id: ids[i], ...data });
+      await new Promise((resolve) => setTimeout(resolve, 200));
       succeeded++;
     } catch (error) {
       failed++;
@@ -62,6 +105,7 @@ export async function batchDeleteCameras(
   for (let i = 0; i < ids.length; i++) {
     try {
       await pb.collection("cameras").delete(ids[i]);
+      await new Promise((resolve) => setTimeout(resolve, 100));
       succeeded++;
     } catch (error) {
       failed++;

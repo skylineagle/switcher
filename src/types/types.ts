@@ -19,9 +19,9 @@ export type Camera = CamerasRecord<CameraAutomation, CameraConfiguration>;
 export type InsertCamera = Omit<Camera, "id" | "created" | "updated">;
 export type UpdateCamera = Partial<InsertCamera> & { id: string };
 
-export type CamerasResponse = BaseCameraResponse<
-  CameraAutomation,
-  CameraConfiguration
+export type CamerasResponse = Omit<
+  BaseCameraResponse<CameraAutomation, CameraConfiguration>,
+  "created" | "updated"
 >;
 
 export enum CamerasJobStatusOptions {

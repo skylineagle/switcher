@@ -4,8 +4,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CamerasResponse } from "@/types/db.types";
-import { CameraAutomation } from "@/types/types";
+import { CamerasResponse } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
 import { motion } from "motion/react";
@@ -17,7 +16,7 @@ type CountdownData = {
 };
 
 interface AutomationIndicatorProps {
-  camera: CamerasResponse<CameraAutomation>;
+  camera: CamerasResponse;
 }
 
 export function AutomationIndicator({ camera }: AutomationIndicatorProps) {

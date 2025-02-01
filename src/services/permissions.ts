@@ -8,6 +8,6 @@ export async function getIsPermitted(
   const permission = await pb
     .collection("permissions")
     .getFirstListItem(`name="${name}"`);
-  console.log(permission.allowed, level);
+
   return permission.allowed.includes(level);
 }

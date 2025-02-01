@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/services/auth";
 import { batchDeleteCameras, batchSetCameraMode } from "@/services/cameras";
 import { getIsPermitted } from "@/services/permissions";
@@ -30,6 +31,18 @@ interface BatchOperationResult {
   failed: number;
   total: number;
 }
+
+const modeConfig = {
+  [CamerasModeOptions.live]: {
+    color: "text-green-500",
+  },
+  [CamerasModeOptions.offline]: {
+    color: "text-slate-500",
+  },
+  [CamerasModeOptions.auto]: {
+    color: "text-blue-500",
+  },
+} as const;
 
 export function BatchOperations({
   selectedCameras,
@@ -124,7 +137,12 @@ export function BatchOperations({
                 })
               }
             >
-              <Power className="mr-2 h-4 w-4" />
+              <Power
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  modeConfig[CamerasModeOptions.live].color
+                )}
+              />
               Set to Live Mode
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -136,7 +154,12 @@ export function BatchOperations({
                 })
               }
             >
-              <Clock className="mr-2 h-4 w-4" />
+              <Clock
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  modeConfig[CamerasModeOptions.auto].color
+                )}
+              />
               Set to Auto Mode
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -148,7 +171,12 @@ export function BatchOperations({
                 })
               }
             >
-              <PowerOff className="mr-2 h-4 w-4" />
+              <PowerOff
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  modeConfig[CamerasModeOptions.offline].color
+                )}
+              />
               Set to Offline Mode
             </DropdownMenuItem>
             <DropdownMenuSeparator />

@@ -14,7 +14,7 @@ import {
   PermissionsAllowedOptions,
 } from "@/types/db.types";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, Eye, EyeOff } from "lucide-react";
+import { Clock, Video, Ban } from "lucide-react";
 import { motion } from "motion/react";
 import { memo } from "react";
 
@@ -28,7 +28,7 @@ export interface ModeSelectorProps {
 const modeConfig = {
   [CamerasModeOptions.live]: {
     label: "Live Stream",
-    icon: Eye,
+    icon: Video,
     description: "Camera is actively streaming",
     color: "text-green-500",
     bgColor: "bg-green-500/10",
@@ -36,7 +36,7 @@ const modeConfig = {
   },
   [CamerasModeOptions.offline]: {
     label: "Offline",
-    icon: EyeOff,
+    icon: Ban,
     description: "Camera is turned off",
     color: "text-slate-500",
     bgColor: "bg-slate-500/10",
@@ -122,14 +122,24 @@ export const ModeSelector = memo(
                   value={modeOption}
                   disabled={isDisabled}
                   className={cn(
-                    "flex items-center gap-2 cursor-pointer",
+                    "flex items-center gap-2 cursor-pointer group",
                     "transition-all duration-200 my-0.5 rounded-md",
                     isSelected && bgColor,
                     !isSelected && hoverColor,
                     isDisabled && "opacity-40 cursor-not-allowed"
                   )}
                 >
-                  <Label className={cn("font-medium", isSelected && color)}>
+                  <Label
+                    className={cn(
+                      "font-medium transition-colors",
+                      isSelected && color,
+                      !isSelected && "group-hover:text-green-500",
+                      modeOption === CamerasModeOptions.offline &&
+                        "group-hover:text-slate-500",
+                      modeOption === CamerasModeOptions.auto &&
+                        "group-hover:text-blue-500"
+                    )}
+                  >
                     {label}
                   </Label>
                 </SelectItem>
