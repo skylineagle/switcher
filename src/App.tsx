@@ -26,7 +26,7 @@ function App() {
                 isAuthenticated ? (
                   <Navigate to="/" replace />
                 ) : (
-                  <AppLayout>
+                  <AppLayout hideBackground>
                     <LoginForm />
                   </AppLayout>
                 )

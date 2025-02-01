@@ -1,4 +1,4 @@
-import { CameraRow } from "@/components/camera/caemra";
+import { CameraRow } from "@/components/camera/camera";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
@@ -11,17 +11,34 @@ import { pb } from "@/lib/pocketbase";
 import { getCameras } from "@/services/cameras";
 import { CamerasResponse } from "@/types/db.types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Checkbox } from "./ui/checkbox";
+import { BatchOperations } from "./camera/batch-operations";
 
-function CameraTableHeader() {
+function CameraTableHeader({
+  onSelectAll,
+  isAllSelected,
+}: {
+  onSelectAll: (checked: boolean) => void;
+  isAllSelected: boolean;
+}) {
   return (
     <TableHeader className="sticky top-0 bg-background z-10">
       <TableRow>
-        <TableHead className="w-[20%]">Name</TableHead>
-        <TableHead className="w-[25%]">Mode</TableHead>
-        <TableHead className="w-[15%]">Status</TableHead>
-        <TableHead className="w-[30%]">Automation</TableHead>
-        <TableHead className="w-[30%]">Actions</TableHead>
+        <TableHead className="w-[50px] px-0">
+          <div className="pl-4">
+            <Checkbox
+              checked={isAllSelected}
+              onCheckedChange={onSelectAll}
+              aria-label="Select all"
+            />
+          </div>
+        </TableHead>
+        <TableHead className="w-[200px]">Name</TableHead>
+        <TableHead className="w-[150px]">Mode</TableHead>
+        <TableHead className="w-[100px]">Status</TableHead>
+        <TableHead className="w-[200px]">Automation</TableHead>
+        <TableHead className="w-[100px]">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );
@@ -29,11 +46,27 @@ function CameraTableHeader() {
 
 export function CamerasPage() {
   const queryClient = useQueryClient();
+  const [selectedCameras, setSelectedCameras] = useState<string[]>([]);
 
   const { data: cameras, isLoading: isCamerasLoading } = useQuery({
     queryKey: ["cameras"],
     queryFn: getCameras,
   });
+
+  const handleSelectCamera = (id: string, checked: boolean) => {
+    setSelectedCameras((prev) =>
+      checked ? [...prev, id] : prev.filter((cameraId) => cameraId !== id)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedCameras(
+      checked ? cameras?.map((camera) => camera.id) || [] : []
+    );
+  };
+
+  const isAllSelected =
+    cameras?.length === selectedCameras.length && selectedCameras.length > 0;
 
   useEffect(() => {
     pb.collection("cameras").subscribe("*", (e) => {
@@ -69,17 +102,32 @@ export function CamerasPage() {
 
   return (
     <Card className="h-full shadow-2xl border-none">
-      <CardHeader></CardHeader>
+      <CardHeader>
+        <BatchOperations
+          selectedCameras={selectedCameras}
+          onClearSelection={() => setSelectedCameras([])}
+        />
+      </CardHeader>
       <CardContent>
-        <div className="relative rounded-md ">
-          <Table>
-            <CameraTableHeader />
-          </Table>
+        <div className="relative rounded-md">
           <div className="max-h-[600px] overflow-y-auto">
             <Table>
+              <CameraTableHeader
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+              />
               <TableBody>
                 {cameras?.map((camera) => {
-                  return <CameraRow camera={camera} key={camera.id} />;
+                  return (
+                    <CameraRow
+                      key={camera.id}
+                      camera={camera}
+                      isSelected={selectedCameras.includes(camera.id)}
+                      onSelect={(checked) =>
+                        handleSelectCamera(camera.id, checked)
+                      }
+                    />
+                  );
                 })}
               </TableBody>
             </Table>
