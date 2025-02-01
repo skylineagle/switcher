@@ -60,7 +60,15 @@ export function BatchOperations({
       );
     },
   });
-
+  const { data: isPermittedToChangeMode } = useQuery({
+    queryKey: ["permissions", "mode_change", user?.id],
+    queryFn: async () => {
+      return getIsPermitted(
+        "mode_change",
+        (user?.level ?? "user") as PermissionsAllowedOptions
+      );
+    },
+  });
   const { mutate: batchDelete, isPending: isDeleting } = useMutation<
     BatchOperationResult,
     Error,
@@ -129,7 +137,7 @@ export function BatchOperations({
             <DropdownMenuLabel>Batch Operations</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              disabled={isProcessing}
+              disabled={isProcessing || !isPermittedToChangeMode}
               onClick={() =>
                 batchSetMode({
                   ids: selectedCameras,
@@ -146,7 +154,7 @@ export function BatchOperations({
               Set to Live Mode
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={isProcessing}
+              disabled={isProcessing || !isPermittedToChangeMode}
               onClick={() =>
                 batchSetMode({
                   ids: selectedCameras,
@@ -163,7 +171,7 @@ export function BatchOperations({
               Set to Auto Mode
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={isProcessing}
+              disabled={isProcessing || !isPermittedToChangeMode}
               onClick={() =>
                 batchSetMode({
                   ids: selectedCameras,
