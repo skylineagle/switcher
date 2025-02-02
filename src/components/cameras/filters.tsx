@@ -1,3 +1,5 @@
+import { AddCameraModal } from "@/components/camera/add-camera-modal";
+import { modeConfig } from "@/components/config";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +10,16 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/services/auth";
+import { getIsPermitted } from "@/services/permissions";
 import { useCameraStore } from "@/stores/camera-store";
-import { CamerasModeOptions } from "@/types/db.types";
+import {
+  CamerasModeOptions,
+  PermissionsAllowedOptions,
+} from "@/types/db.types";
+import { useQuery } from "@tanstack/react-query";
 import { Check, Search, X } from "lucide-react";
 import { memo, useCallback } from "react";
-import { modeConfig } from "../config";
 
 function renderModeIcon(mode: CamerasModeOptions) {
   const Icon = modeConfig[mode].icon;
@@ -20,6 +27,7 @@ function renderModeIcon(mode: CamerasModeOptions) {
 }
 
 export const Filters = memo(() => {
+  const { user } = useAuthStore();
   const {
     searchQuery,
     selectedModes,
@@ -28,6 +36,14 @@ export const Filters = memo(() => {
     clearMode,
     clearFilters,
   } = useCameraStore();
+  const { data: isAllowdToCreate } = useQuery({
+    queryKey: ["camera_create"],
+    queryFn: () =>
+      getIsPermitted(
+        "camera_create",
+        (user?.level || "user") as PermissionsAllowedOptions
+      ),
+  });
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,35 +86,44 @@ export const Filters = memo(() => {
             ))}
           </SelectContent>
         </Select>
+        {isAllowdToCreate && <AddCameraModal />}
       </div>
-      {selectedModes.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          {selectedModes.map((mode) => (
-            <Badge key={mode} variant="secondary">
-              <div className="flex items-center gap-2">
+      {(selectedModes.length > 0 || searchQuery) && (
+        <div className="flex items-center gap-2">
+          <div className="flex flex-wrap gap-2">
+            {selectedModes.map((mode) => (
+              <Badge
+                key={mode}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
                 {renderModeIcon(mode)}
                 <span>{modeConfig[mode].label}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 w-4 p-0 hover:bg-transparent"
+                <X
+                  className="ml-1 h-3 w-3 cursor-pointer hover:text-destructive"
                   onClick={() => clearMode(mode)}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            </Badge>
-          ))}
-          {selectedModes.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Clear all filters
-            </Button>
-          )}
+                />
+              </Badge>
+            ))}
+            {searchQuery && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Search className="h-3 w-3" />
+                <span>{searchQuery}</span>
+                <X
+                  className="ml-1 h-3 w-3 cursor-pointer hover:text-destructive"
+                  onClick={() => setSearchQuery("")}
+                />
+              </Badge>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Clear all
+          </Button>
         </div>
       )}
     </div>

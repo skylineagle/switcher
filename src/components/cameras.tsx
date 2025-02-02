@@ -17,8 +17,10 @@ export function CamerasPage() {
     useCameraStore();
 
   useEffect(() => {
-    pb.collection("cameras").subscribe("*", () => {
-      queryClient.invalidateQueries({ queryKey: ["cameras"] });
+    pb.collection("cameras").subscribe("*", (e) => {
+      if (e.action === "create" || e.action === "delete") {
+        queryClient.invalidateQueries({ queryKey: ["cameras"] });
+      }
     });
 
     return () => {

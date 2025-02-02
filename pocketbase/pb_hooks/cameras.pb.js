@@ -1,5 +1,92 @@
 /// <reference path="../pb_data/types.d.ts" />
 
+// Handle create request
+onRecordCreateRequest((e) => {
+  const configuration = JSON.parse(e.record.get("configuration"));
+
+  e.record.set(
+    "configuration",
+    JSON.stringify({
+      sourceFingerprint: "",
+      sourceOnDemand: false,
+      sourceOnDemandStartTimeout: "10s",
+      sourceOnDemandCloseAfter: "10s",
+      maxReaders: 0,
+      srtReadPassphrase: "",
+      fallback: "",
+      record: false,
+      recordPath: "./recordings/%path/%Y-%m-%d_%H-%M-%S-%f",
+      recordFormat: "fmp4",
+      recordPartDuration: "1s",
+      recordSegmentDuration: "1h0m0s",
+      recordDeleteAfter: "1d",
+      overridePublisher: true,
+      srtPublishPassphrase: "",
+      rtspTransport: "automatic",
+      rtspAnyPort: false,
+      rtspRangeType: "",
+      rtspRangeStart: "",
+      sourceRedirect: "",
+      rpiCameraCamID: 0,
+      rpiCameraWidth: 1920,
+      rpiCameraHeight: 1080,
+      rpiCameraHFlip: false,
+      rpiCameraVFlip: false,
+      rpiCameraBrightness: 0,
+      rpiCameraContrast: 1,
+      rpiCameraSaturation: 1,
+      rpiCameraSharpness: 1,
+      rpiCameraExposure: "normal",
+      rpiCameraAWB: "auto",
+      rpiCameraAWBGains: [0, 0],
+      rpiCameraDenoise: "off",
+      rpiCameraShutter: 0,
+      rpiCameraMetering: "centre",
+      rpiCameraGain: 0,
+      rpiCameraEV: 0,
+      rpiCameraROI: "",
+      rpiCameraHDR: false,
+      rpiCameraTuningFile: "",
+      rpiCameraMode: "",
+      rpiCameraFPS: 30,
+      rpiCameraAfMode: "continuous",
+      rpiCameraAfRange: "normal",
+      rpiCameraAfSpeed: "normal",
+      rpiCameraLensPosition: 0,
+      rpiCameraAfWindow: "",
+      rpiCameraFlickerPeriod: 0,
+      rpiCameraTextOverlayEnable: false,
+      rpiCameraTextOverlay: "%Y-%m-%d %H:%M:%S - MediaMTX",
+      rpiCameraCodec: "auto",
+      rpiCameraIDRPeriod: 60,
+      rpiCameraBitrate: 5000000,
+      rpiCameraProfile: "main",
+      rpiCameraLevel: "4.1",
+      runOnInit: "",
+      runOnInitRestart: false,
+      runOnDemand: "",
+      runOnDemandRestart: false,
+      runOnDemandStartTimeout: "10s",
+      runOnDemandCloseAfter: "10s",
+      runOnUnDemand: "",
+      runOnReady: "",
+      runOnReadyRestart: false,
+      runOnNotReady: "",
+      runOnRead: "",
+      runOnReadRestart: false,
+      runOnUnread: "",
+      runOnRecordSegmentCreate: "",
+      runOnRecordSegmentComplete: "",
+      ...configuration,
+    })
+  );
+  e.record.set("mode", "offline");
+  e.record.set("status", "off");
+  e.record.set("allowed", ["super", "manager", "user"]);
+
+  e.next();
+});
+
 // Handle adter sucessful creation
 onRecordAfterCreateSuccess((e) => {
   const { createCameraJob } = require(`${__hooks}/job.utils`);
