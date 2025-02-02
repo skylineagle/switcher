@@ -29,8 +29,8 @@ export function CamerasPage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <Card className="h-full shadow-2xl border-none">
-      <CardHeader>
+    <Card className="shadow-2xl border-none">
+      <CardHeader className="pb-4">
         <Filters />
         <BatchOperations
           selectedCameras={selectedCameras}
@@ -38,27 +38,33 @@ export function CamerasPage() {
         />
       </CardHeader>
       <CardContent>
-        <Table>
-          <CameraTableHeader
-            onSelectAll={() =>
-              selectAllCameras(cameras?.map((camera) => camera.id) ?? [])
-            }
-            isAllSelected={
-              cameras?.length === selectedCameras.length &&
-              selectedCameras.length > 0
-            }
-          />
-          <TableBody>
-            {cameras?.map((camera) => (
-              <CameraRow
-                key={camera.id}
-                camera={camera}
-                isSelected={selectedCameras.includes(camera.id)}
-                onSelect={selectCamera}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <div className="bg-background">
+          <Table>
+            <CameraTableHeader
+              onSelectAll={() =>
+                selectAllCameras(cameras?.map((camera) => camera.id) ?? [])
+              }
+              isAllSelected={
+                cameras?.length === selectedCameras.length &&
+                selectedCameras.length > 0
+              }
+            />
+          </Table>
+        </div>
+        <div className="overflow-auto h-[calc(100vh-24rem)] scrollbar-thin scrollbar-thumb-secondary scrollbar-track-secondary/20">
+          <Table>
+            <TableBody className="relative">
+              {cameras?.map((camera) => (
+                <CameraRow
+                  key={camera.id}
+                  camera={camera}
+                  isSelected={selectedCameras.includes(camera.id)}
+                  onSelect={selectCamera}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
