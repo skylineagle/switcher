@@ -17,7 +17,7 @@ export const CameraTableHeader = memo(
     return (
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[50px] px-0">
+          <TableHead className="w-[5%] px-0">
             <div className="pl-4">
               <Checkbox
                 checked={isAllSelected}
@@ -27,7 +27,7 @@ export const CameraTableHeader = memo(
             </div>
           </TableHead>
           <TableHead
-            className="cursor-pointer hover:bg-accent transition-colors"
+            className="w-[10%] cursor-pointer hover:bg-accent transition-colors"
             onClick={() => setSortState("name")}
           >
             <div className="flex items-center gap-2">
@@ -49,7 +49,7 @@ export const CameraTableHeader = memo(
             </div>
           </TableHead>
           <TableHead
-            className="cursor-pointer hover:bg-accent transition-colors"
+            className="w-[15%] cursor-pointer hover:bg-accent transition-colors"
             onClick={() => setSortState("mode")}
           >
             <div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export const CameraTableHeader = memo(
             </div>
           </TableHead>
           <TableHead
-            className="cursor-pointer hover:bg-accent transition-colors"
+            className="w-[15%] cursor-pointer hover:bg-accent transition-colors"
             onClick={() => setSortState("status")}
           >
             <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export const CameraTableHeader = memo(
             </div>
           </TableHead>
           <TableHead
-            className="cursor-pointer hover:bg-accent transition-colors"
+            className="w-[20%] cursor-pointer hover:bg-accent transition-colors"
             onClick={() => setSortState("automation")}
           >
             <div className="flex items-center gap-2">
@@ -114,7 +114,7 @@ export const CameraTableHeader = memo(
               )}
             </div>
           </TableHead>
-          <TableHead>Actions</TableHead>
+          <TableHead className="w-[15%]">Actions</TableHead>
         </TableRow>
       </TableHeader>
     );

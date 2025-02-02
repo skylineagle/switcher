@@ -52,7 +52,7 @@ export const CameraRow = memo(
 
     return (
       <TableRow>
-        <TableCell className="w-[50px] px-0">
+        <TableCell className="w-[5%] px-0">
           <div className="pl-4">
             <Checkbox
               checked={isSelected}
@@ -65,26 +65,26 @@ export const CameraRow = memo(
             />
           </div>
         </TableCell>
-        <TableCell className="w-[200px]">
+        <TableCell className="w-[10%]">
           <CameraName
             nickname={camera.nickname}
             name={camera.configuration?.name || ""}
           />
         </TableCell>
-        <TableCell className="w-[150px]">
+        <TableCell className="w-[15%]">
           <ModeSelector
             mode={camera.mode}
             automation={Boolean(camera.automation)}
             handleModeChange={handleModeChange}
           />
         </TableCell>
-        <TableCell className="w-[100px]">
+        <TableCell className="w-[15%]">
           <StatusIndicator status={camera.status} />
         </TableCell>
-        <TableCell className="w-[200px]">
+        <TableCell className="w-[20%]">
           <AutomationIndicator camera={camera} />
         </TableCell>
-        <TableCell className="w-[100px]">
+        <TableCell className="w-[15%]">
           <div className="flex gap-2">
             <ConfigurationEditor camera={camera} />
             {user?.level === "manager" ||
