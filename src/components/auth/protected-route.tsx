@@ -1,6 +1,8 @@
 import { useAuthStore } from "@/services/auth";
+import { pb } from "@/lib/pocketbase";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useInterval } from "usehooks-ts";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,6 +17,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+  useInterval(() => {
+    if (isAuthenticated) {
+      pb.collection("users").authRefresh();
+    }
+  }, 1000 * 60 * 2);
 
   if (!isAuthenticated) return null;
 

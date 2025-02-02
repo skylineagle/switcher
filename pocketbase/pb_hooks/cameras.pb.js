@@ -63,15 +63,15 @@ onRecordUpdateRequest((e) => {
         deleteMediaMTXPath(currentConfiguration.name);
         startCameraJob(e.record.id);
       } else if (mode === "live") {
-        $app.logger().info("Stopping job");
+        $app.logger().debug("Stopping job");
         stopCameraJob(e.record.id);
 
-        $app.logger().info("Adding camera to MediaMTX");
+        $app.logger().debug("Adding camera to MediaMTX");
         addMediaMTXPath(configuration);
       }
       // If mode changed to off or live, stop and delete job
       else {
-        $app.logger().info("Stopping job");
+        $app.logger().debug("Stopping job");
         stopCameraJob(e.record.id);
 
         deleteMediaMTXPath(currentConfiguration.name);

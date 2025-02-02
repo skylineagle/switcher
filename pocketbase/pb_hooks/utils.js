@@ -3,12 +3,12 @@
 const MEDIAMTX_API = $os.getenv("MEDIAMTX_API") || "http://mediamtx:9997";
 
 function updateStatus() {
-  $app.logger().info("Updating status");
+  $app.logger().debug("Updating status");
   try {
     // Fetch all cameras
     const cameras = $app.findAllRecords("cameras");
     if (!cameras || cameras.length === 0) {
-      $app.logger().info("No cameras found");
+      $app.logger().debug("No cameras found");
       return;
     }
     // Fetch live cameras from MediaMTX
@@ -32,9 +32,7 @@ function updateStatus() {
       const cameraStatus = liveCameras
         .map((path) => path.name)
         .includes(cameraName);
-      $app
-        .logger()
-        .info(`Updating Camera ${cameraName} status to: ${cameraStatus}`);
+
       camera.set(
         "status",
         cameraStatus
