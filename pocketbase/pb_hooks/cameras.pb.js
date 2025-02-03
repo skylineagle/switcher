@@ -7,6 +7,7 @@ onRecordCreateRequest((e) => {
   e.record.set(
     "configuration",
     JSON.stringify({
+      ...configuration,
       sourceFingerprint: "",
       sourceOnDemand: false,
       sourceOnDemandStartTimeout: "10s",
@@ -22,7 +23,7 @@ onRecordCreateRequest((e) => {
       recordDeleteAfter: "1d",
       overridePublisher: true,
       srtPublishPassphrase: "",
-      rtspTransport: "automatic",
+      rtspTransport: "tcp",
       rtspAnyPort: false,
       rtspRangeType: "",
       rtspRangeStart: "",
@@ -77,7 +78,6 @@ onRecordCreateRequest((e) => {
       runOnUnread: "",
       runOnRecordSegmentCreate: "",
       runOnRecordSegmentComplete: "",
-      ...configuration,
     })
   );
   e.record.set("mode", "offline");
