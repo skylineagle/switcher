@@ -8,6 +8,7 @@ interface CameraFilters {
   selectedModes: CamerasModeOptions[];
   sortState: SortState;
   selectedCameras: string[];
+  isReversed: boolean;
 }
 
 interface CameraActions {
@@ -19,6 +20,7 @@ interface CameraActions {
   clearSelection: () => void;
   clearFilters: () => void;
   clearMode: (mode: CamerasModeOptions) => void;
+  toggleReversed: () => void;
 }
 
 const initialState: CameraFilters = {
@@ -29,6 +31,7 @@ const initialState: CameraFilters = {
     direction: null,
   },
   selectedCameras: [],
+  isReversed: false,
 };
 
 export const useCameraStore = create<CameraFilters & CameraActions>()(
@@ -73,11 +76,13 @@ export const useCameraStore = create<CameraFilters & CameraActions>()(
           searchQuery: "",
           selectedModes: [],
           sortState: initialState.sortState,
+          isReversed: false,
         }),
       clearMode: (mode) =>
         set((state) => ({
           selectedModes: state.selectedModes.filter((m) => m !== mode),
         })),
+      toggleReversed: () => set((state) => ({ isReversed: !state.isReversed })),
     }),
     {
       name: "camera-store",

@@ -9,6 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/services/auth";
 import { getIsPermitted } from "@/services/permissions";
@@ -35,6 +36,8 @@ export const Filters = memo(() => {
     toggleMode,
     clearMode,
     clearFilters,
+    isReversed,
+    toggleReversed,
   } = useCameraStore();
   const { data: isAllowdToCreate } = useQuery({
     queryKey: ["camera_create"],
@@ -59,10 +62,24 @@ export const Filters = memo(() => {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search cameras..."
-            className="pl-9"
+            className="pl-9 pr-[100px]"
             value={searchQuery}
             onChange={handleSearchChange}
           />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <Switch
+              checked={isReversed}
+              onCheckedChange={toggleReversed}
+              id="reverse-filter"
+              className="data-[state=checked]:bg-primary"
+            />
+            <label
+              htmlFor="reverse-filter"
+              className="text-xs text-muted-foreground cursor-pointer select-none whitespace-nowrap"
+            >
+              Reverse
+            </label>
+          </div>
         </div>
         <Select value="select-mode" onValueChange={toggleMode}>
           <SelectTrigger className="w-[180px]">
@@ -86,6 +103,7 @@ export const Filters = memo(() => {
             ))}
           </SelectContent>
         </Select>
+
         {isAllowdToCreate && <AddCameraModal />}
       </div>
       {(selectedModes.length > 0 || searchQuery) && (

@@ -15,7 +15,7 @@ import { pb } from "@/lib/pocketbase";
 import { cn } from "@/lib/utils";
 import { CamerasResponse } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,20 +30,19 @@ const formSchema = z.object({
   }),
   automation: z
     .object({
-      minutesOn: z.number().min(1, "Must be at least 1 minute").optional(),
-      minutesOff: z.number().min(1, "Must be at least 1 minute").optional(),
+      minutesOn: z.number().optional(),
+      minutesOff: z.number().optional(),
     })
     .refine(
       (data) => {
-        if (data.minutesOn && !data.minutesOff) return false;
-        if (!data.minutesOn && data.minutesOff) return false;
+        if (data?.minutesOn && !data?.minutesOff) return false;
+        if (!data?.minutesOn && data?.minutesOff) return false;
         return true;
       },
       {
         message: "Both Minutes On and Minutes Off must be set together",
       }
-    )
-    .optional(),
+    ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,13 +51,6 @@ export function AddCameraModal() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: levels } = useQuery({
-    queryKey: ["levels"],
-    queryFn: () => pb.collection("levels").getFullList(),
-  });
-
-  console.log(levels);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,10 +58,6 @@ export function AddCameraModal() {
       configuration: {
         name: "",
         source: "",
-      },
-      automation: {
-        minutesOn: undefined,
-        minutesOff: undefined,
       },
     },
   });
@@ -186,9 +174,11 @@ export function AddCameraModal() {
                   <Input
                     id="minutesOn"
                     type="number"
+                    required={false}
                     placeholder="Enter minutes to stay on"
                     {...form.register("automation.minutesOn", {
                       valueAsNumber: true,
+                      required: false,
                     })}
                     className={cn(
                       form.formState.errors.automation?.minutesOn &&
@@ -206,6 +196,7 @@ export function AddCameraModal() {
                   <Input
                     id="minutesOff"
                     type="number"
+                    required={false}
                     placeholder="Enter minutes to stay off"
                     {...form.register("automation.minutesOff", {
                       valueAsNumber: true,

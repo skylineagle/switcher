@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 export function useCamerasQuery() {
-  const { selectedModes, searchQuery, sortState } = useCameraStore();
+  const { selectedModes, searchQuery, sortState, isReversed } =
+    useCameraStore();
 
   const { data: cameras, isLoading } = useQuery({
     queryKey: ["cameras", { modes: selectedModes }],
@@ -17,11 +18,12 @@ export function useCamerasQuery() {
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result?.filter(
-        (camera) =>
+      result = result?.filter((camera) => {
+        const matches =
           camera.nickname?.toLowerCase().includes(query) ||
-          camera.configuration?.name.toLowerCase().includes(query)
-      );
+          camera.configuration?.name.toLowerCase().includes(query);
+        return isReversed ? !matches : matches;
+      });
     }
 
     // Apply sorting
@@ -62,7 +64,7 @@ export function useCamerasQuery() {
     }
 
     return result;
-  }, [cameras, searchQuery, sortState]);
+  }, [cameras, searchQuery, sortState, isReversed]);
 
   return {
     cameras: sortedAndFilteredCameras,
