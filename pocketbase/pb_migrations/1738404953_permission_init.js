@@ -19,7 +19,7 @@ migrate((app) => {
 
   app.save(
     new Record(collection, {
-      name: "view_stream",
+      name: "stream_view",
       allowed: ["manager", "super"],
     })
   );
