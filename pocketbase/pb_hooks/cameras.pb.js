@@ -83,6 +83,7 @@ onRecordCreateRequest((e) => {
   e.record.set("mode", "offline");
   e.record.set("status", "off");
   e.record.set("allowed", ["super", "manager", "user"]);
+  e.record.set("hide", e.record.get("hide") ?? false);
 
   e.next();
 });

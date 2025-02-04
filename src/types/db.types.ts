@@ -110,6 +110,7 @@ export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
 	automation?: null | Tautomation
 	configuration: null | Tconfiguration
 	created?: IsoDateString
+	hide?: boolean
 	id: string
 	mode: CamerasModeOptions
 	nickname?: string
