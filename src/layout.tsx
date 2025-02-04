@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { UserProfile } from "@/components/ui/user-profile";
 import { ParticleBackground } from "./background";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { useAuthStore } from "./services/auth";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,8 +13,6 @@ export function AppLayout({
   children,
   hideBackground = false,
 }: AppLayoutProps) {
-  const { isAuthenticated, user } = useAuthStore();
-
   return (
     <TooltipProvider>
       <div className="h-screen">
