@@ -25,9 +25,7 @@ export function AppLayout({
             <div className="flex items-center gap-2">
               <img src="/logo.png" alt="Switcher Logo" className="h-16 w-16" />
               <h1 className="text-3xl font-bold">
-                {isAuthenticated
-                  ? `Welcome, ${user?.username ?? user?.email.split("@")[0]}`
-                  : "Switcher"}
+                HaTomer
               </h1>
             </div>
 
