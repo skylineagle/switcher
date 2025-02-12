@@ -12,6 +12,7 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Cameras = "cameras",
+	Configurations = "configurations",
 	Levels = "levels",
 	Permissions = "permissions",
 	Users = "users",
@@ -118,6 +119,14 @@ export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
 	updated?: IsoDateString
 }
 
+export type ConfigurationsRecord<Tvalue = unknown> = {
+	created?: IsoDateString
+	id: string
+	name?: string
+	updated?: IsoDateString
+	value?: null | Tvalue
+}
+
 export type LevelsRecord = {
 	created?: IsoDateString
 	id: string
@@ -163,6 +172,7 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type CamerasResponse<Tautomation = unknown, Tconfiguration = unknown, Texpand = unknown> = Required<CamerasRecord<Tautomation, Tconfiguration>> & BaseSystemFields<Texpand>
+export type ConfigurationsResponse<Tvalue = unknown, Texpand = unknown> = Required<ConfigurationsRecord<Tvalue>> & BaseSystemFields<Texpand>
 export type LevelsResponse<Texpand = unknown> = Required<LevelsRecord> & BaseSystemFields<Texpand>
 export type PermissionsResponse<Texpand = unknown> = Required<PermissionsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -176,6 +186,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	cameras: CamerasRecord
+	configurations: ConfigurationsRecord
 	levels: LevelsRecord
 	permissions: PermissionsRecord
 	users: UsersRecord
@@ -188,6 +199,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	cameras: CamerasResponse
+	configurations: ConfigurationsResponse
 	levels: LevelsResponse
 	permissions: PermissionsResponse
 	users: UsersResponse
@@ -203,6 +215,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'cameras'): RecordService<CamerasResponse>
+	collection(idOrName: 'configurations'): RecordService<ConfigurationsResponse>
 	collection(idOrName: 'levels'): RecordService<LevelsResponse>
 	collection(idOrName: 'permissions'): RecordService<PermissionsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>

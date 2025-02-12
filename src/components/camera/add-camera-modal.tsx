@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -10,12 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { pb } from "@/lib/pocketbase";
 import { cn } from "@/lib/utils";
 import { CamerasResponse } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,23 +24,8 @@ const formSchema = z.object({
   nickname: z.string().min(2, "Nickname must be at least 2 characters"),
   configuration: z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
-    source: z.string().url("Must be a valid URL"),
+    ipAddress: z.string().ip("Must be a valid IP address"),
   }),
-  automation: z
-    .object({
-      minutesOn: z.number().optional(),
-      minutesOff: z.number().optional(),
-    })
-    .refine(
-      (data) => {
-        if (data?.minutesOn && !data?.minutesOff) return false;
-        if (!data?.minutesOn && data?.minutesOff) return false;
-        return true;
-      },
-      {
-        message: "Both Minutes On and Minutes Off must be set together",
-      }
-    ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -57,14 +40,41 @@ export function AddCameraModal() {
       nickname: "",
       configuration: {
         name: "",
-        source: "",
+        ipAddress: "",
       },
     },
   });
 
+  const { data: sourceTemplate } = useQuery({
+    queryKey: ["source"],
+    queryFn: async () => {
+      const template = await pb
+        .collection("configurations")
+        .getFirstListItem<{ value: { template: string } }>("name = 'source'");
+
+      return template.value.template;
+    },
+  });
+
   const { mutate: addCamera, isPending } = useMutation({
-    mutationFn: async (data: FormValues) => {
-      return pb.collection("cameras").create<CamerasResponse>(data);
+    mutationFn: async ({ configuration, ...data }: FormValues) => {
+      if (!sourceTemplate) {
+        throw new Error("Source template must be set in the db.");
+      }
+
+      const sourceUrl = sourceTemplate
+        .replace("<ip>", configuration.ipAddress)
+        .replace("<id>", configuration.name);
+      const configWithSource = {
+        name: configuration.name,
+        source: sourceUrl,
+      };
+
+      return pb.collection("cameras").create<CamerasResponse>({
+        ...data,
+        configuration: configWithSource,
+        automation: null,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cameras"] });
@@ -91,130 +101,59 @@ export function AddCameraModal() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New Camera</DialogTitle>
-          <DialogDescription>
-            Fill in the details below to add a new camera to your system.
-          </DialogDescription>
+          <DialogTitle>Add Camera</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium mb-3">Basic Information</h4>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="nickname">Nickname</Label>
-                  <Input
-                    id="nickname"
-                    placeholder="Enter a nickname for this camera"
-                    {...form.register("nickname")}
-                    className={cn(
-                      form.formState.errors.nickname && "border-destructive"
-                    )}
-                  />
-                  {form.formState.errors.nickname && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.nickname.message}
-                    </p>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 my-2">
+          <div className="space-y-6">
+            <div className="grid gap-4 grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="nickname">Nickname</Label>
+                <Input
+                  id="nickname"
+                  {...form.register("nickname")}
+                  className={cn(
+                    form.formState.errors.nickname && "border-destructive"
                   )}
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 className="text-sm font-medium mb-3">Configuration</h4>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Configuration Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter a name for this configuration"
-                    {...form.register("configuration.name")}
-                    className={cn(
-                      form.formState.errors.configuration?.name &&
-                        "border-destructive"
-                    )}
-                  />
-                  {form.formState.errors.configuration?.name && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.configuration.name.message}
-                    </p>
-                  )}
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="source">Source URL</Label>
-                  <Input
-                    id="source"
-                    placeholder="Enter the camera source URL"
-                    {...form.register("configuration.source")}
-                    className={cn(
-                      form.formState.errors.configuration?.source &&
-                        "border-destructive"
-                    )}
-                  />
-                  {form.formState.errors.configuration?.source && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.configuration.source.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 className="text-sm font-medium mb-3">
-                Automation (Optional)
-              </h4>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="minutesOn">Minutes On</Label>
-                  <Input
-                    id="minutesOn"
-                    type="number"
-                    required={false}
-                    placeholder="Enter minutes to stay on"
-                    {...form.register("automation.minutesOn", {
-                      valueAsNumber: true,
-                      required: false,
-                    })}
-                    className={cn(
-                      form.formState.errors.automation?.minutesOn &&
-                        "border-destructive"
-                    )}
-                  />
-                  {form.formState.errors.automation?.minutesOn && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.automation.minutesOn.message}
-                    </p>
-                  )}
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="minutesOff">Minutes Off</Label>
-                  <Input
-                    id="minutesOff"
-                    type="number"
-                    required={false}
-                    placeholder="Enter minutes to stay off"
-                    {...form.register("automation.minutesOff", {
-                      valueAsNumber: true,
-                    })}
-                    className={cn(
-                      form.formState.errors.automation?.minutesOff &&
-                        "border-destructive"
-                    )}
-                  />
-                  {form.formState.errors.automation?.minutesOff && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.automation.minutesOff.message}
-                    </p>
-                  )}
-                </div>
-                {form.formState.errors.automation?.root && (
+                />
+                {form.formState.errors.nickname && (
                   <p className="text-sm text-destructive">
-                    {form.formState.errors.automation.root.message}
+                    {form.formState.errors.nickname.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="name">Device ID</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter the device 4 digit ID"
+                  {...form.register("configuration.name")}
+                  className={cn(
+                    form.formState.errors.configuration?.name &&
+                      "border-destructive"
+                  )}
+                />
+                {form.formState.errors.configuration?.name && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.configuration.name.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="ipAddress">IP Address</Label>
+                <Input
+                  id="ipAddress"
+                  {...form.register("configuration.ipAddress")}
+                  className={cn(
+                    form.formState.errors.configuration?.ipAddress &&
+                      "border-destructive"
+                  )}
+                />
+                {form.formState.errors.configuration?.ipAddress && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.configuration.ipAddress.message}
                   </p>
                 )}
               </div>
