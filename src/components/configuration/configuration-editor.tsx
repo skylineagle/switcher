@@ -258,6 +258,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
                   type="number"
                   className="col-span-3"
                   value={editingConfig?.automation?.minutesOn ?? 0}
+                  min={1}
                   onChange={(e) =>
                     setEditingConfig((prev) => ({
                       ...prev!,
@@ -281,6 +282,7 @@ export function ConfigurationEditor({ camera }: ConfigurationEditorProps) {
                   type="number"
                   className="col-span-3"
                   value={editingConfig?.automation?.minutesOff ?? 0}
+                  min={1}
                   onChange={(e) =>
                     setEditingConfig((prev) => ({
                       ...prev!,

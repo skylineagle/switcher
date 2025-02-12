@@ -30,7 +30,14 @@ app.post("/jobs/:camera", async ({ params, body }) => {
     const { camera } = params;
     const parsedBody = typeof body === "string" ? JSON.parse(body) : body;
     const automation = parsedBody as CameraAutomation;
-
+    if (
+      !automation ||
+      automation.minutesOff === 0 ||
+      automation.minutesOn === 0
+    ) {
+      logger.info(`Automation values are invalid for camera ${camera}`);
+      return { success: false, error: "Invalid automation values" };
+    }
     logger.info("Creating new job");
     await createJob(camera, automation);
 
