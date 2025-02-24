@@ -1,11 +1,11 @@
-import { MEDIAMTX_API } from "@/services/switcher/config";
-import { RunResponse, RunTargetOptions } from "@/types/db.types";
-import { CamerasResponse } from "@/types/types";
+import { MEDIAMTX_API } from "@/config";
+import { logger } from "@/logger";
+import { pb } from "@/pocketbase";
+import { type RunResponse, RunTargetOptions } from "@/types/db.types";
+import type { CamerasResponse } from "@/types/types";
 import cors from "@elysiajs/cors";
 import { $ } from "bun";
 import { Elysia, t } from "elysia";
-import { logger } from "./logger";
-import { pb } from "./pocketbase";
 
 export const TO_REPLACE = ["camera", "action"];
 

@@ -78,8 +78,8 @@ jobs:
       - name: Build and push Baker Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile.baker
+          context: ./services/baker
+          file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -113,8 +113,8 @@ jobs:
       - name: Build and push Switcher Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile.switcher
+          context: ./services/switcher
+          file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

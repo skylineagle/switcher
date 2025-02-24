@@ -22,7 +22,7 @@ import {
   CamerasModeOptions,
   PermissionsAllowedOptions,
 } from "@/types/db.types";
-import { CameraAutomation, CamerasResponse, UpdateCamera } from "types/types";
+import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";

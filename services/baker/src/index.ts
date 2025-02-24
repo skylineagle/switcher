@@ -1,6 +1,3 @@
-import { CameraAutomation } from "@/types/types";
-import { Elysia } from "elysia";
-import cors from "@elysiajs/cors";
 import {
   createJob,
   deleteJob,
@@ -8,8 +5,11 @@ import {
   getNextExecution,
   startJob,
   stopJob,
-} from "./baker";
-import { logger } from "./logger";
+} from "@/baker";
+import { logger } from "@/logger";
+import type { CameraAutomation } from "@/types/types";
+import cors from "@elysiajs/cors";
+import { Elysia } from "elysia";
 
 const app = new Elysia()
   .onError(({ code, error, request }) => {

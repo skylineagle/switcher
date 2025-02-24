@@ -8,9 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "db:generate": "pocketbase-typegen -d ./pocketbase/pb_data/data.db -o ./types/db.types.ts && pocketbase-typegen -d ./pocketbase/pb_data/data.db -o ./src/types/db.types.ts",
-    "baker": "bun run --watch src/services/baker/index.ts",
-    "switcher": "bun run --watch src/services/switcher/index.ts"
+    "db:generate": "pocketbase-typegen -d ./pocketbase/pb_data/data.db -o ./src/types/db.types.ts",
+    "baker": "bun run --watch services/baker/index.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",

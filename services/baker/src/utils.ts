@@ -1,4 +1,4 @@
-import { MEDIAMTX_API, SWITCHER_API_URL } from "@/services/baker/config";
+import { MEDIAMTX_API, SWITCHER_API_URL } from "@/config";
 import { logger } from "./logger";
 
 export const API_URL = `${MEDIAMTX_API}/v3`;

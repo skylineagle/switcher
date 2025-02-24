@@ -1,5 +1,5 @@
-import { POCKETBASE_URL, USERNAME, PASSWORD } from "@/services/switcher/config";
-import { TypedPocketBase } from "@/types/db.types";
+import { POCKETBASE_URL, USERNAME, PASSWORD } from "@/config";
+import type { TypedPocketBase } from "@/types/db.types";
 import PocketBase from "pocketbase";
 
 export const pb = new PocketBase(POCKETBASE_URL) as TypedPocketBase;

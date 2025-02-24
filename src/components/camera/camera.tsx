@@ -9,7 +9,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { useAuthStore } from "@/lib/auth";
 import { updateCamera } from "@/lib/cameras";
 import { CamerasModeOptions } from "@/types/db.types";
-import { CamerasResponse, UpdateCamera } from "types/types";
+import { CamerasResponse, UpdateCamera } from "@/types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { memo, useCallback } from "react";
 import { toast } from "sonner";

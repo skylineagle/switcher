@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateCamera } from "@/lib/cameras";
-import { CameraAutomation, CamerasResponse, UpdateCamera } from "types/types";
+import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";

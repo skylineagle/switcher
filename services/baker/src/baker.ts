@@ -1,7 +1,7 @@
-import { pb } from "@/services/baker/pocketbase";
-import { CameraAutomation, CamerasResponse } from "@/types/types";
-import { Baker, Status } from "cronbake";
-import { logger } from "./logger";
+import { logger } from "@/logger";
+import { pb } from "@/pocketbase";
+import type { CameraAutomation, CamerasResponse } from "@/types/types";
+import { Baker, type Status } from "cronbake";
 import { getMediaMTXPaths, toggleMode } from "./utils";
 
 const baker = Baker.create();

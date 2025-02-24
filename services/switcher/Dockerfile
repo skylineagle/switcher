@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 COPY . .
-CMD ["bun", "run", "src/services/switcher/index.ts"] 
+CMD ["bun", "run", "src/index.ts"] 
