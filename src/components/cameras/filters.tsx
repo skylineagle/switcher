@@ -10,9 +10,9 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useAuthStore } from "@/lib/auth";
+import { getIsPermitted } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/services/auth";
-import { getIsPermitted } from "@/services/permissions";
 import { useCameraStore } from "@/stores/camera-store";
 import {
   CamerasModeOptions,

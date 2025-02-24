@@ -1,6 +1,6 @@
 import { pb } from "@/lib/pocketbase";
 import { CamerasModeOptions } from "@/types/db.types";
-import { CamerasResponse, UpdateCamera } from "@/types/types";
+import { CamerasResponse, UpdateCamera } from "types/types";
 
 export async function getCamerasIds() {
   const records = await pb.collection("cameras").getFullList<CamerasResponse>({

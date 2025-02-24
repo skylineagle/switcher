@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { urls } from "@/lib/urls";
-import { logout, useAuthStore } from "@/services/auth";
+import { logout, useAuthStore } from "@/lib/auth";
 import { LogOut } from "lucide-react";
 import { Button } from "./button";
 

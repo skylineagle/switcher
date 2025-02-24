@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { urls } from "@/lib/urls";
-import { CamerasResponse } from "@/types/types";
+import { CamerasResponse } from "types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
 import { motion } from "motion/react";

@@ -2,7 +2,7 @@ import { Label } from "@radix-ui/react-label";
 import type React from "react";
 import { Badge } from "./badge";
 import { cn } from "@/lib/utils";
-import { Camera } from "@/types/types";
+import { Camera } from "types/types";
 
 const sizeClasses = {
   small: "w-1.5 h-1.5",

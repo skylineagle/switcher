@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { LiveIndicator } from "@/components/ui/live-indicator";
-import { Camera } from "@/types/types";
+import { Camera } from "types/types";
 import { memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 

@@ -6,10 +6,10 @@ import { ConfigurationEditor } from "@/components/configuration/configuration-ed
 import { DeleteCamera } from "@/components/delete-camera/delete-camera";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useAuthStore } from "@/services/auth";
-import { updateCamera } from "@/services/cameras";
+import { useAuthStore } from "@/lib/auth";
+import { updateCamera } from "@/lib/cameras";
 import { CamerasModeOptions } from "@/types/db.types";
-import { CamerasResponse, UpdateCamera } from "@/types/types";
+import { CamerasResponse, UpdateCamera } from "types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { memo, useCallback } from "react";
 import { toast } from "sonner";

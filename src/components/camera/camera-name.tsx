@@ -5,12 +5,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useAuthStore } from "@/services/auth";
-import { PermissionsAllowedOptions } from "@/types/db.types";
-import { getIsPermitted } from "@/services/permissions";
+import { useAuthStore } from "@/lib/auth";
+import { getIsPermitted } from "@/lib/permissions";
 import { Label } from "@radix-ui/react-label";
-import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { memo } from "react";
+import { PermissionsAllowedOptions } from "@/types/db.types";
 
 export interface CameraNameProps {
   nickname?: string;

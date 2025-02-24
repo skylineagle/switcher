@@ -1,4 +1,4 @@
-import { getCameras } from "@/services/cameras";
+import { getCameras } from "@/lib/cameras";
 import { useCameraStore } from "@/stores/camera-store";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";

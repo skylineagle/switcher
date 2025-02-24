@@ -22,8 +22,10 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/types/*": ["./types/*"],
+      "@/services/*": ["./services/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "types", "services"]
 }

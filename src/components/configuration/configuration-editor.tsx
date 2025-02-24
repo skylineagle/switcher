@@ -15,14 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/services/auth";
-import { updateCamera } from "@/services/cameras";
-import { getIsPermitted } from "@/services/permissions";
+import { useAuthStore } from "@/lib/auth";
+import { updateCamera } from "@/lib/cameras";
+import { getIsPermitted } from "@/lib/permissions";
 import {
   CamerasModeOptions,
   PermissionsAllowedOptions,
 } from "@/types/db.types";
-import { CameraAutomation, CamerasResponse, UpdateCamera } from "@/types/types";
+import { CameraAutomation, CamerasResponse, UpdateCamera } from "types/types";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";

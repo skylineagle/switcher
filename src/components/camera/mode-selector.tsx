@@ -6,17 +6,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuthStore } from "@/lib/auth";
+import { getIsPermitted } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/services/auth";
-import { getIsPermitted } from "@/services/permissions";
+import { useQuery } from "@tanstack/react-query";
+import { Ban, Clock, Video } from "lucide-react";
+import { motion } from "motion/react";
+import { memo } from "react";
 import {
   CamerasModeOptions,
   PermissionsAllowedOptions,
 } from "@/types/db.types";
-import { useQuery } from "@tanstack/react-query";
-import { Clock, Video, Ban } from "lucide-react";
-import { motion } from "motion/react";
-import { memo } from "react";
 
 export interface ModeSelectorProps {
   mode: CamerasModeOptions;

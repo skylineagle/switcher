@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/services/auth";
-import { batchDeleteCameras, batchSetCameraMode } from "@/services/cameras";
-import { getIsPermitted } from "@/services/permissions";
+import { useAuthStore } from "@/lib/auth";
+import { batchDeleteCameras, batchSetCameraMode } from "@/lib/cameras";
+import { getIsPermitted } from "@/lib/permissions";
 import {
   CamerasModeOptions,
   PermissionsAllowedOptions,

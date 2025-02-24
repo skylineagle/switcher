@@ -9,11 +9,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAuthStore } from "@/services/auth";
-import { deleteCamera } from "@/services/cameras";
-import { getIsPermitted } from "@/services/permissions";
+import { useAuthStore } from "@/lib/auth";
+import { deleteCamera } from "@/lib/cameras";
+import { getIsPermitted } from "@/lib/permissions";
 import { PermissionsAllowedOptions } from "@/types/db.types";
-import { CamerasResponse } from "@/types/types";
+import { CamerasResponse } from "types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
