@@ -79,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./services/baker
-          file: Dockerfile
+          file: ./services/baker/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -114,7 +114,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./services/switcher
-          file: Dockerfile
+          file: ./services/switcher/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
