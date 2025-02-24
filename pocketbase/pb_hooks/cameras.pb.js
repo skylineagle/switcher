@@ -134,35 +134,29 @@ onRecordUpdateRequest((e) => {
 onRecordUpdateRequest((e) => {
   const { updateStatus } = require(`${__hooks}/utils`);
   const { startCameraJob, stopCameraJob } = require(`${__hooks}/job.utils`);
-  const {
-    addMediaMTXPath,
-    deleteMediaMTXPath,
-  } = require(`${__hooks}/mediamtx.utils`);
+  const { toggleMode } = require(`${__hooks}/switcher.pb`);
   const current = $app.findRecordById("cameras", e.record.id);
   const mode = e.record.get("mode");
 
   if (mode && mode !== current.get("mode")) {
     $app.logger().info("Mode changed, syncing camera state");
-    const currentConfiguration = JSON.parse(current.get("configuration"));
-    const configuration = JSON.parse(e.record.get("configuration"));
+
     try {
       // If mode changed to auto, create and start job
       if (mode === "auto") {
-        deleteMediaMTXPath(currentConfiguration.name);
         startCameraJob(e.record.id);
+        toggleMode(e.record.id, "auto");
       } else if (mode === "live") {
         $app.logger().debug("Stopping job");
-        stopCameraJob(e.record.id);
 
-        $app.logger().debug("Adding camera to MediaMTX");
-        addMediaMTXPath(configuration);
+        stopCameraJob(e.record.id);
+        toggleMode(e.record.id, "live");
       }
       // If mode changed to off or live, stop and delete job
       else {
         $app.logger().debug("Stopping job");
         stopCameraJob(e.record.id);
-
-        deleteMediaMTXPath(currentConfiguration.name);
+        toggleMode(e.record.id, "offline");
       }
     } catch (error) {
       $app.logger().error(error);
@@ -176,7 +170,6 @@ onRecordUpdateRequest((e) => {
 // Handle after successful deletion
 onRecordAfterDeleteSuccess((e) => {
   const { stopCameraJob, deleteCameraJob } = require(`${__hooks}/job.utils`);
-  const { deleteMediaMTXPath } = require(`${__hooks}/mediamtx.utils`);
 
   $app.logger().info(`Camera deleted with ID: ${e.record.id}`);
 
@@ -184,7 +177,7 @@ onRecordAfterDeleteSuccess((e) => {
     // Stop and delete any existing job
     stopCameraJob(e.record.id);
     deleteCameraJob(e.record.id);
-    deleteMediaMTXPath(e.record.get("configuration").name);
+    toggleMode(e.record.id, "offline");
   } catch (error) {
     $app.logger().error(error);
   }

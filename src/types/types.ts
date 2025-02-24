@@ -15,12 +15,18 @@ export interface CameraConfiguration {
   source: string;
 }
 
+export interface CameraInfo {
+  host: string;
+  user: string;
+  password: string;
+}
+
 export type Camera = CamerasRecord<CameraAutomation, CameraConfiguration>;
 export type InsertCamera = Omit<Camera, "id" | "created" | "updated">;
 export type UpdateCamera = Partial<InsertCamera> & { id: string };
 
 export type CamerasResponse = Omit<
-  BaseCameraResponse<CameraAutomation, CameraConfiguration>,
+  BaseCameraResponse<CameraAutomation, CameraConfiguration, CameraInfo>,
   "created" | "updated"
 >;
 

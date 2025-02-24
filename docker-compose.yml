@@ -73,11 +73,35 @@ services:
     environment:
       - MEDIAMTX_API=http://mediamtx:9997
       - POCKETBASE_URL=http://pocketbase:8090
+      - SWITCHER_API_URL=http://switcher:8000
     depends_on:
       pocketbase:
         condition: service_healthy
       mediamtx:
         condition: service_started
+    networks:
+      - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  switcher:
+    image: ghcr.io/skylineagle/switcher/switcher:main
+    build:
+      context: .
+      dockerfile: Dockerfile.switcher
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MEDIAMTX_API=http://mediamtx:9997
+      - POCKETBASE_URL=http://pocketbase:8090
+    depends_on:
+      - pocketbase
+      - mediamtx
+      - baker
     networks:
       - app-network
     logging:

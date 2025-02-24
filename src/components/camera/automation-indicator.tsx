@@ -4,6 +4,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { urls } from "@/lib/urls";
 import { CamerasResponse } from "@/types/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
@@ -23,9 +24,7 @@ export function AutomationIndicator({ camera }: AutomationIndicatorProps) {
   const { data } = useQuery<CountdownData>({
     queryKey: ["next-job", camera.id],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_BAKER_URL}/jobs/${camera.id}/next`
-      );
+      const response = await fetch(`${urls.baker}/jobs/${camera.id}/next`);
       const data = await response.json();
 
       if (

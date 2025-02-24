@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { urls } from "@/lib/urls";
 import { logout, useAuthStore } from "@/services/auth";
 import { LogOut } from "lucide-react";
 import { Button } from "./button";
@@ -30,9 +31,7 @@ export function UserProfile() {
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar>
             <AvatarImage
-              src={`${import.meta.env.VITE_POCKETBASE_URL}/api/files/${
-                user.collectionId
-              }/${user.id}/${user.avatar}`}
+              src={`${urls.pocketbase}/api/files/${user.collectionId}/${user.id}/${user.avatar}`}
               alt={user.username || user.email}
             />
             <AvatarFallback>{initials}</AvatarFallback>

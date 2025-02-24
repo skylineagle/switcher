@@ -14,7 +14,9 @@ export enum Collections {
 	Cameras = "cameras",
 	Configurations = "configurations",
 	Levels = "levels",
+	Models = "models",
 	Permissions = "permissions",
+	Run = "run",
 	Users = "users",
 }
 
@@ -106,14 +108,16 @@ export enum CamerasAllowedOptions {
 	"manager" = "manager",
 	"user" = "user",
 }
-export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown> = {
+export type CamerasRecord<Tautomation = unknown, Tconfiguration = unknown, Tinfo = unknown> = {
 	allowed?: CamerasAllowedOptions[]
 	automation?: null | Tautomation
 	configuration: null | Tconfiguration
 	created?: IsoDateString
 	hide?: boolean
 	id: string
+	info?: null | Tinfo
 	mode: CamerasModeOptions
+	model?: RecordIdString
 	nickname?: string
 	status?: CamerasStatusOptions
 	updated?: IsoDateString
@@ -134,6 +138,13 @@ export type LevelsRecord = {
 	updated?: IsoDateString
 }
 
+export type ModelsRecord = {
+	created?: IsoDateString
+	id: string
+	name: string
+	updated?: IsoDateString
+}
+
 export enum PermissionsAllowedOptions {
 	"super" = "super",
 	"manager" = "manager",
@@ -144,6 +155,26 @@ export type PermissionsRecord = {
 	created?: IsoDateString
 	id: string
 	name: string
+	updated?: IsoDateString
+}
+
+export enum RunTargetOptions {
+	"local" = "local",
+	"remote" = "remote",
+}
+
+export enum RunActionOptions {
+	"live" = "live",
+	"offline" = "offline",
+	"auto" = "auto",
+}
+export type RunRecord = {
+	action?: RunActionOptions
+	command?: string
+	created?: IsoDateString
+	id: string
+	model: RecordIdString
+	target: RunTargetOptions
 	updated?: IsoDateString
 }
 
@@ -171,10 +202,12 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CamerasResponse<Tautomation = unknown, Tconfiguration = unknown, Texpand = unknown> = Required<CamerasRecord<Tautomation, Tconfiguration>> & BaseSystemFields<Texpand>
+export type CamerasResponse<Tautomation = unknown, Tconfiguration = unknown, Tinfo = unknown, Texpand = unknown> = Required<CamerasRecord<Tautomation, Tconfiguration, Tinfo>> & BaseSystemFields<Texpand>
 export type ConfigurationsResponse<Tvalue = unknown, Texpand = unknown> = Required<ConfigurationsRecord<Tvalue>> & BaseSystemFields<Texpand>
 export type LevelsResponse<Texpand = unknown> = Required<LevelsRecord> & BaseSystemFields<Texpand>
+export type ModelsResponse<Texpand = unknown> = Required<ModelsRecord> & BaseSystemFields<Texpand>
 export type PermissionsResponse<Texpand = unknown> = Required<PermissionsRecord> & BaseSystemFields<Texpand>
+export type RunResponse<Texpand = unknown> = Required<RunRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -188,7 +221,9 @@ export type CollectionRecords = {
 	cameras: CamerasRecord
 	configurations: ConfigurationsRecord
 	levels: LevelsRecord
+	models: ModelsRecord
 	permissions: PermissionsRecord
+	run: RunRecord
 	users: UsersRecord
 }
 
@@ -201,7 +236,9 @@ export type CollectionResponses = {
 	cameras: CamerasResponse
 	configurations: ConfigurationsResponse
 	levels: LevelsResponse
+	models: ModelsResponse
 	permissions: PermissionsResponse
+	run: RunResponse
 	users: UsersResponse
 }
 
@@ -217,6 +254,8 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'cameras'): RecordService<CamerasResponse>
 	collection(idOrName: 'configurations'): RecordService<ConfigurationsResponse>
 	collection(idOrName: 'levels'): RecordService<LevelsResponse>
+	collection(idOrName: 'models'): RecordService<ModelsResponse>
 	collection(idOrName: 'permissions'): RecordService<PermissionsResponse>
+	collection(idOrName: 'run'): RecordService<RunResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

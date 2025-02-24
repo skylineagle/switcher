@@ -2,11 +2,7 @@ import { pb } from "@/services/baker/pocketbase";
 import { CameraAutomation, CamerasResponse } from "@/types/types";
 import { Baker, Status } from "cronbake";
 import { logger } from "./logger";
-import {
-  addMediaMTXPath,
-  getMediaMTXPaths,
-  removeMediaMTXPath,
-} from "./mediamtx-controller";
+import { getMediaMTXPaths, toggleMode } from "./utils";
 
 const baker = Baker.create();
 
@@ -22,15 +18,7 @@ async function initializeJobs() {
         await createJob(camera.id, camera.automation);
         logger.info(`Initialized job for camera ${camera.id}`);
 
-        if (camera.mode === "auto") {
-          logger.info(`Starting job for camera ${camera.id} on auto mode`);
-          await startJob(camera.id);
-        } else if (camera.mode === "live") {
-          if (camera.configuration) {
-            logger.info(`Starting job for camera ${camera.id} on live mode`);
-            await addMediaMTXPath(camera.configuration);
-          }
-        }
+        await toggleMode(camera.id, camera.mode ?? "offline");
       }
     }
 
@@ -41,7 +29,6 @@ async function initializeJobs() {
   }
 }
 
-// Initialize jobs on startup
 initializeJobs();
 
 export async function createJob(
@@ -64,15 +51,13 @@ export async function createJob(
           throw new Error("Camera configuration is null");
         }
 
-        await addMediaMTXPath(data.configuration);
+        await toggleMode(data.id, "live");
         updateStatus();
         logger.info(`Camera ${camera} turned on`);
 
-        // Keep camera on for specified duration
         setTimeout(async () => {
           if (baker.isRunning(camera) && data.configuration?.name) {
-            // Turn camera off after duration
-            await removeMediaMTXPath(data.configuration.name);
+            await toggleMode(data.id, "offline");
             updateStatus();
             logger.info(`Camera ${camera} turned off`);
           } else {
