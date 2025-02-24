@@ -7,6 +7,7 @@ services:
     environment:
       - BAKER_URL=http://baker:3000
       - MEDIAMTX_API=http://mediamtx:9997
+      - SWITCHER_API_URL=http://switcher:8000
     volumes:
       - pb_data:/pb_data
       - ./pocketbase/pb_public:/pb_public
@@ -64,9 +65,6 @@ services:
 
   baker:
     image: ghcr.io/skylineagle/switcher/baker:main
-    build:
-      context: .
-      dockerfile: Dockerfile.baker
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -89,9 +87,6 @@ services:
 
   switcher:
     image: ghcr.io/skylineagle/switcher/switcher:main
-    build:
-      context: .
-      dockerfile: Dockerfile.switcher
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -100,8 +95,6 @@ services:
       - POCKETBASE_URL=http://pocketbase:8090
     depends_on:
       - pocketbase
-      - mediamtx
-      - baker
     networks:
       - app-network
     logging:
