@@ -1,60 +1,40 @@
+import { getDefaultModeConfig, modeConfig } from "@/components/camera/consts";
 import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
+import { useDeviceActions } from "@/hooks/use-device-actions";
 import { useAuthStore } from "@/lib/auth";
 import { getIsPermitted } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { Ban, Clock, Video } from "lucide-react";
-import { motion } from "motion/react";
-import { memo } from "react";
 import {
   CamerasModeOptions,
   PermissionsAllowedOptions,
 } from "@/types/db.types";
+import { useQuery } from "@tanstack/react-query";
+import { Ban } from "lucide-react";
+import { motion } from "motion/react";
+import { memo, useMemo } from "react";
 
 export interface ModeSelectorProps {
-  mode: CamerasModeOptions;
+  mode: CamerasModeOptions | string;
   automation: boolean;
   handleModeChange: (mode: CamerasModeOptions) => void;
   isLoading?: boolean;
+  modelId: string;
 }
 
-const modeConfig = {
-  [CamerasModeOptions.live]: {
-    label: "Live Stream",
-    icon: Video,
-    description: "Camera is actively streaming",
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
-    hoverColor: "hover:bg-green-500/10",
-  },
-  [CamerasModeOptions.offline]: {
-    label: "Offline",
-    icon: Ban,
-    description: "Camera is turned off",
-    color: "text-slate-500",
-    bgColor: "bg-slate-500/10",
-    hoverColor: "hover:bg-slate-500/10",
-  },
-  [CamerasModeOptions.auto]: {
-    label: "Automated",
-    icon: Clock,
-    description: "Camera follows automated schedule",
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-    hoverColor: "hover:bg-blue-500/10",
-  },
-} as const;
-
 export const ModeSelector = memo(
-  ({ mode, automation, handleModeChange, isLoading }: ModeSelectorProps) => {
-    const currentMode = modeConfig[mode];
+  ({
+    mode,
+    automation,
+    handleModeChange,
+    isLoading,
+    modelId,
+  }: ModeSelectorProps) => {
     const { user } = useAuthStore();
     const { data: isPermitted } = useQuery({
       queryKey: ["permissions", "mode_change", user?.id],
@@ -65,11 +45,36 @@ export const ModeSelector = memo(
         ),
     });
 
+    // Fetch available actions for this camera model
+    const { data: deviceActions = [], isLoading: isLoadingActions } =
+      useDeviceActions(modelId);
+
+    // Create a map of available actions
+    const availableActions = useMemo(() => {
+      return deviceActions.map((action) => action.name);
+    }, [deviceActions]);
+
+    const currentMode =
+      modeConfig?.[mode as CamerasModeOptions] || getDefaultModeConfig(mode);
+
+    if (isLoadingActions) {
+      return (
+        <Select disabled value={mode}>
+          <SelectTrigger className="w-40 opacity-70">
+            <div className="flex items-center gap-2">
+              <Ban className="h-4 w-4" />
+              <span>Loading...</span>
+            </div>
+          </SelectTrigger>
+        </Select>
+      );
+    }
+
     return (
       <Select
         value={mode}
         onValueChange={handleModeChange}
-        disabled={isLoading || !isPermitted}
+        disabled={isLoading || !isPermitted || availableActions.length === 0}
       >
         <SelectTrigger
           className={cn(
@@ -100,50 +105,69 @@ export const ModeSelector = memo(
             >
               <currentMode.icon className={cn("h-4 w-4", currentMode.color)} />
             </motion.div>
-            <SelectValue />
+            <span className="truncate">{currentMode.label}</span>
           </motion.div>
         </SelectTrigger>
 
         <SelectContent className="w-44 border-none bg-popover/95 backdrop-blur-sm shadow-xl">
-          {Object.values(CamerasModeOptions).map((modeOption) => {
-            const { label, color, bgColor, hoverColor } =
-              modeConfig[modeOption];
-            const isDisabled = modeOption === "auto" && !automation;
-            const isSelected = mode === modeOption;
+          {availableActions.map((actionName) => {
+            const configKey = actionName as CamerasModeOptions;
+            const config =
+              modeConfig[configKey] || getDefaultModeConfig(actionName);
+
+            const { label, color, bgColor, hoverColor, icon: Icon } = config;
+            const isDisabled = actionName === "auto" && !automation;
+            const isSelected = mode === actionName;
 
             return (
-              <motion.div
-                key={modeOption}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
+              <SelectItem
+                value={actionName}
+                disabled={isDisabled}
+                className={cn(
+                  "transition-all duration-200 rounded-md",
+                  isSelected && bgColor,
+                  !isSelected && hoverColor,
+                  isDisabled && "opacity-40 cursor-not-allowed"
+                )}
               >
-                <SelectItem
-                  value={modeOption}
-                  disabled={isDisabled}
-                  className={cn(
-                    "flex items-center gap-2 cursor-pointer group",
-                    "transition-all duration-200 my-0.5 rounded-md",
-                    isSelected && bgColor,
-                    !isSelected && hoverColor,
-                    isDisabled && "opacity-40 cursor-not-allowed"
-                  )}
-                >
+                <div className="flex flex-row items-center cursor-pointer my-0.5 px-2 py-1.5">
+                  <Icon
+                    className={cn(
+                      "h-4 w-4 mr-2",
+                      isSelected ? color : "text-muted-foreground",
+                      !isSelected &&
+                        actionName === CamerasModeOptions.offline &&
+                        "group-hover:text-slate-500",
+                      !isSelected &&
+                        actionName === CamerasModeOptions.auto &&
+                        "group-hover:text-blue-500",
+                      !isSelected &&
+                        actionName === CamerasModeOptions.live &&
+                        "group-hover:text-green-500",
+                      !isSelected &&
+                        actionName !== CamerasModeOptions.offline &&
+                        actionName !== CamerasModeOptions.auto &&
+                        actionName !== CamerasModeOptions.live &&
+                        "group-hover:text-purple-500"
+                    )}
+                  />
                   <Label
                     className={cn(
                       "font-medium transition-colors",
                       isSelected && color,
-                      !isSelected && "group-hover:text-green-500",
-                      modeOption === CamerasModeOptions.offline &&
+                      !isSelected && "group-hover:text-purple-500",
+                      actionName === CamerasModeOptions.offline &&
                         "group-hover:text-slate-500",
-                      modeOption === CamerasModeOptions.auto &&
-                        "group-hover:text-blue-500"
+                      actionName === CamerasModeOptions.auto &&
+                        "group-hover:text-blue-500",
+                      actionName === CamerasModeOptions.live &&
+                        "group-hover:text-green-500"
                     )}
                   >
                     {label}
                   </Label>
-                </SelectItem>
-              </motion.div>
+                </div>
+              </SelectItem>
             );
           })}
         </SelectContent>

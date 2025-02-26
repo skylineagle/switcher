@@ -1,6 +1,9 @@
 import type {
-  CamerasRecord,
+  ActionsResponse,
   CamerasResponse as BaseCameraResponse,
+  RunResponse as BaseRunResponse,
+  CamerasRecord,
+  ModelsResponse,
 } from "./db.types";
 
 export type CameraMode = "live" | "off" | "auto";
@@ -35,3 +38,8 @@ export enum CamerasJobStatusOptions {
   "stopped" = "stopped",
   "none" = "none",
 }
+
+export type RunResponse = BaseRunResponse<{
+  model: ModelsResponse;
+  action: ActionsResponse;
+}>;

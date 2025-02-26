@@ -37,7 +37,7 @@ export async function getCameras({
   const records = await pb
     .collection("cameras")
     .getList<CamerasResponse>(1, 50, {
-      fields: "id,nickname,configuration,automation,mode,status",
+      fields: "id,nickname,configuration,automation,mode,status,model",
       filter: filterStr || undefined,
     });
 
@@ -46,7 +46,7 @@ export async function getCameras({
 
 export async function getCamera(id: string) {
   const record = await pb.collection("cameras").getOne<CamerasResponse>(id, {
-    fields: "id,nickname,configuration,automation,mode,status",
+    fields: "id,nickname,configuration,automation,mode,status,model",
   });
   return record;
 }
@@ -123,7 +123,7 @@ export async function batchDeleteCameras(
 
 export async function batchSetCameraMode(
   ids: string[],
-  mode: CamerasModeOptions,
+  mode: string,
   onProgress?: (current: number, total: number) => void
 ) {
   return batchUpdateCameras({

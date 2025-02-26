@@ -76,6 +76,7 @@ export const CameraRow = memo(
             mode={camera.mode}
             automation={Boolean(camera.automation)}
             handleModeChange={handleModeChange}
+            modelId={camera.model}
           />
         </TableCell>
         <TableCell className="w-[15%]">

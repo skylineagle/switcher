@@ -1,19 +1,21 @@
-import { getCameras } from "@/lib/cameras";
+import { GetCamerasOptions, getCameras } from "@/lib/cameras";
 import { useCameraStore } from "@/stores/camera-store";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-export function useCamerasQuery() {
-  const { selectedModes, searchQuery, sortState, isReversed } =
-    useCameraStore();
+export function useCamerasQuery(options?: GetCamerasOptions) {
+  const { searchQuery, sortState, isReversed } = useCameraStore();
 
-  const { data: cameras, isLoading } = useQuery({
-    queryKey: ["cameras", { modes: selectedModes }],
-    queryFn: () => getCameras({ modes: selectedModes }),
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["cameras", options?.modes, options?.search],
+    queryFn: async () => {
+      const cameras = await getCameras(options || {});
+      return cameras;
+    },
   });
 
   const sortedAndFilteredCameras = useMemo(() => {
-    let result = cameras;
+    let result = data;
 
     // Apply search filter
     if (searchQuery.trim()) {
@@ -64,10 +66,12 @@ export function useCamerasQuery() {
     }
 
     return result;
-  }, [cameras, searchQuery, sortState, isReversed]);
+  }, [data, searchQuery, sortState, isReversed]);
 
   return {
     cameras: sortedAndFilteredCameras,
     isLoading,
+    isError,
+    error,
   };
 }
