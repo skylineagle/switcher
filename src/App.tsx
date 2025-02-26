@@ -1,7 +1,7 @@
 import { CamerasPage } from "@/components/cameras";
-import type { AuthState } from "@/lib/auth";
-import { useAuthStore } from "@/lib/auth";
+import { pb } from "@/lib/pocketbase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginForm } from "./components/auth/login-form";
 import { ProtectedRoute } from "./components/auth/protected-route";
@@ -11,9 +11,16 @@ import { AppLayout } from "./layout";
 const queryClient = new QueryClient();
 
 function App() {
-  const isAuthenticated = useAuthStore(
-    (state: AuthState) => state.isAuthenticated
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    const unsubscribe = pb.authStore.onChange(() => {
+      setIsAuthenticated(pb.authStore.isValid);
+    }, true);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

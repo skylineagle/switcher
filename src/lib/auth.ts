@@ -54,10 +54,3 @@ export async function logout() {
     user: null,
   });
 }
-
-// Initialize auth state from PocketBase
-pb.authStore.onChange(() => {
-  useAuthStore.setState({
-    isAuthenticated: pb.authStore.isValid,
-  });
-});

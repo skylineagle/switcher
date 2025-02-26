@@ -13,7 +13,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !pb.authStore.isValid) {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
