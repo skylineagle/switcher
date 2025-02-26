@@ -1,7 +1,11 @@
 import { MEDIAMTX_API } from "@/config";
 import { logger } from "@/logger";
 import { pb } from "@/pocketbase";
-import { type RunResponse, RunTargetOptions } from "@/types/db.types";
+import {
+  type ActionsResponse,
+  type RunResponse,
+  RunTargetOptions,
+} from "@/types/db.types";
 import type { CamerasResponse } from "@/types/types";
 import cors from "@elysiajs/cors";
 import { $ } from "bun";
@@ -33,7 +37,7 @@ app.post(
         .collection("cameras")
         .getFullList<CamerasResponse>(1, {
           filter: `id = "${params.camera}"`,
-          expand: "model",
+          expand: "model,action",
         });
 
       if (result.length !== 1)
@@ -41,14 +45,27 @@ app.post(
 
       const camera = result[0];
 
+      // Fetch the action and ensure it exists
+      const actionResult = await pb
+        .collection("actions")
+        .getFullList<ActionsResponse>(1, {
+          filter: `name = "${params.action}"`,
+        });
+
+      if (actionResult.length !== 1) {
+        throw new Error(`Action ${params.action} is not available`);
+      }
+
+      const action = actionResult[0];
+
       const runResult = await pb.collection("run").getFullList<RunResponse>(1, {
-        filter: `model = "${camera.model}" && action = "${params.action}"`,
+        filter: `model = "${camera.model}" && action = "${action.id}"`,
       });
       const runConfig = runResult[0];
 
       if (!runConfig)
         throw new Error(
-          `Run configuration not found for action ${params.action} on model ${camera.model}`
+          `Action ${params.action} is not available for model ${camera.model}`
         );
 
       const command = runConfig.command

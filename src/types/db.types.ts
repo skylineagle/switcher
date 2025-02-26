@@ -11,6 +11,7 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
+	Actions = "actions",
 	Cameras = "cameras",
 	Configurations = "configurations",
 	Levels = "levels",
@@ -91,6 +92,13 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
+export type ActionsRecord = {
+	created?: IsoDateString
+	id: string
+	name: string
+	updated?: IsoDateString
+}
+
 export enum CamerasModeOptions {
 	"live" = "live",
 	"auto" = "auto",
@@ -162,14 +170,8 @@ export enum RunTargetOptions {
 	"local" = "local",
 	"remote" = "remote",
 }
-
-export enum RunActionOptions {
-	"live" = "live",
-	"offline" = "offline",
-	"auto" = "auto",
-}
 export type RunRecord = {
-	action?: RunActionOptions
+	action: RecordIdString
 	command?: string
 	created?: IsoDateString
 	id: string
@@ -202,6 +204,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type ActionsResponse<Texpand = unknown> = Required<ActionsRecord> & BaseSystemFields<Texpand>
 export type CamerasResponse<Tautomation = unknown, Tconfiguration = unknown, Tinfo = unknown, Texpand = unknown> = Required<CamerasRecord<Tautomation, Tconfiguration, Tinfo>> & BaseSystemFields<Texpand>
 export type ConfigurationsResponse<Tvalue = unknown, Texpand = unknown> = Required<ConfigurationsRecord<Tvalue>> & BaseSystemFields<Texpand>
 export type LevelsResponse<Texpand = unknown> = Required<LevelsRecord> & BaseSystemFields<Texpand>
@@ -218,6 +221,7 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	actions: ActionsRecord
 	cameras: CamerasRecord
 	configurations: ConfigurationsRecord
 	levels: LevelsRecord
@@ -233,6 +237,7 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	actions: ActionsResponse
 	cameras: CamerasResponse
 	configurations: ConfigurationsResponse
 	levels: LevelsResponse
@@ -251,6 +256,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
+	collection(idOrName: 'actions'): RecordService<ActionsResponse>
 	collection(idOrName: 'cameras'): RecordService<CamerasResponse>
 	collection(idOrName: 'configurations'): RecordService<ConfigurationsResponse>
 	collection(idOrName: 'levels'): RecordService<LevelsResponse>
