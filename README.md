@@ -62,3 +62,19 @@ Contributions are welcome! Please follow these guidelines:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Cheatsheet
+
+default commands:
+
+add to mediamtx -
+
+```
+curl -X POST -H "Content-Type: application/json" -d '$configuration' $mediamtx/v3/config/paths/add/$name
+```
+
+remove from mediamtx -
+
+```
+curl -X DELETE $mediamtx/v3/config/paths/delete/$name
+```
